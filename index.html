@@ -3489,25 +3489,34 @@ function getDailyData(ss, date) {
             }
             
             updateConnectionStatus('testing', 'Menguji koneksi...');
+            addLogEntry('Menguji koneksi...', '');
             
             try {
+                // Use fetch with redirect follow for Apps Script
                 const response = await fetch(url + '?type=test', {
                     method: 'GET',
-                    mode: 'no-cors'
+                    redirect: 'follow'
                 });
                 
-                // Since no-cors doesn't give us response data, we assume success if no error
-                updateConnectionStatus('connected', 'Koneksi berhasil (mode no-cors)');
-                addLogEntry('Test koneksi berhasil', 'success');
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateConnectionStatus('connected', 'Terhubung ke: ' + (result.spreadsheetName || 'Spreadsheet'));
+                    addLogEntry('✓ Koneksi berhasil! Sheets: ' + (result.sheets ? result.sheets.join(', ') : 'OK'), 'success');
+                    alert('Koneksi berhasil!\n\nSpreadsheet: ' + (result.spreadsheetName || 'OK') + '\nSheets: ' + (result.sheets ? result.sheets.join(', ') : 'OK'));
+                } else {
+                    throw new Error(result.error || result.message || 'Unknown error');
+                }
             } catch (error) {
-                updateConnectionStatus('error', 'Koneksi gagal: ' + error.message);
-                addLogEntry('Test koneksi gagal: ' + error.message, 'error');
+                updateConnectionStatus('error', 'Koneksi gagal');
+                addLogEntry('✗ Gagal: ' + error.message, 'error');
+                alert('Koneksi gagal!\n\nError: ' + error.message + '\n\nPastikan:\n1. URL Web App benar\n2. Apps Script sudah di-deploy\n3. Access diset "Anyone"');
             }
         }
 
         async function syncDailyToSheet() {
             if (!gsheetSettings.webAppUrl) {
-                alert('Silakan setup Google Sheets terlebih dahulu di tab Settings');
+                alert('Silakan setup Google Sheets terlebih dahulu di tab Google Sheets');
                 return;
             }
             
@@ -3532,26 +3541,32 @@ function getDailyData(ss, date) {
             };
             
             try {
-                addLogEntry('Mengirim data Daily Log...', '');
+                addLogEntry('Mengirim Daily Log...', '');
                 
-                await fetch(gsheetSettings.webAppUrl, {
+                const response = await fetch(gsheetSettings.webAppUrl, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    redirect: 'follow',
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(data)
                 });
                 
-                addLogEntry('Daily Log berhasil disync ke Google Sheets', 'success');
-                alert('Data hari ini berhasil disimpan ke Google Sheets!');
+                const result = await response.json();
+                
+                if (result.success) {
+                    addLogEntry('✓ Daily Log tersimpan (' + data.date + ')', 'success');
+                    alert('Data hari ini berhasil disimpan ke Google Sheets!');
+                } else {
+                    throw new Error(result.error || result.message || 'Gagal menyimpan');
+                }
             } catch (error) {
-                addLogEntry('Gagal sync Daily Log: ' + error.message, 'error');
+                addLogEntry('✗ Gagal sync Daily: ' + error.message, 'error');
                 alert('Gagal menyimpan: ' + error.message);
             }
         }
 
         async function syncKanbanToSheet() {
             if (!gsheetSettings.webAppUrl) {
-                alert('Silakan setup Google Sheets terlebih dahulu di tab Settings');
+                alert('Silakan setup Google Sheets terlebih dahulu di tab Google Sheets');
                 return;
             }
             
@@ -3561,26 +3576,32 @@ function getDailyData(ss, date) {
             };
             
             try {
-                addLogEntry('Mengirim data Kanban...', '');
+                addLogEntry('Mengirim data Kanban (' + tasks.length + ' tugas)...', '');
                 
-                await fetch(gsheetSettings.webAppUrl, {
+                const response = await fetch(gsheetSettings.webAppUrl, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    redirect: 'follow',
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(data)
                 });
                 
-                addLogEntry('Kanban berhasil disync ke Google Sheets (' + tasks.length + ' tugas)', 'success');
-                alert('Data Kanban berhasil disimpan ke Google Sheets!');
+                const result = await response.json();
+                
+                if (result.success) {
+                    addLogEntry('✓ Kanban tersimpan (' + (result.taskCount || tasks.length) + ' tugas)', 'success');
+                    alert('Data Kanban berhasil disimpan ke Google Sheets!');
+                } else {
+                    throw new Error(result.error || result.message || 'Gagal menyimpan');
+                }
             } catch (error) {
-                addLogEntry('Gagal sync Kanban: ' + error.message, 'error');
+                addLogEntry('✗ Gagal sync Kanban: ' + error.message, 'error');
                 alert('Gagal menyimpan: ' + error.message);
             }
         }
 
         async function loadKanbanFromSheet() {
             if (!gsheetSettings.webAppUrl) {
-                alert('Silakan setup Google Sheets terlebih dahulu di tab Settings');
+                alert('Silakan setup Google Sheets terlebih dahulu di tab Google Sheets');
                 return;
             }
             
@@ -3589,39 +3610,92 @@ function getDailyData(ss, date) {
             }
             
             try {
-                addLogEntry('Mengambil data Kanban dari Google Sheets...', '');
+                addLogEntry('Mengambil data Kanban...', '');
                 
-                // Note: Due to CORS, this might not work directly. 
-                // User needs to ensure their Apps Script is properly configured
-                const response = await fetch(gsheetSettings.webAppUrl + '?type=kanban');
+                const response = await fetch(gsheetSettings.webAppUrl + '?type=kanban', {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
+                
                 const result = await response.json();
                 
-                if (result.success && result.data && result.data.tasks) {
+                if (result.success) {
+                    const loadedTasks = result.tasks || [];
+                    
                     // Clear current tasks display
                     document.querySelectorAll('.task-card').forEach(el => el.remove());
                     
                     // Load new tasks
-                    tasks = result.data.tasks;
-                    taskIdCounter = Math.max(...tasks.map(t => t.id), 0) + 1;
+                    tasks = loadedTasks;
+                    if (tasks.length > 0) {
+                        taskIdCounter = Math.max(...tasks.map(t => parseInt(t.id) || 0), 0) + 1;
+                    } else {
+                        taskIdCounter = 1;
+                    }
                     
                     tasks.forEach(task => renderTask(task));
                     updateCounts();
                     saveToLocalStorage();
                     
-                    addLogEntry('Berhasil memuat ' + tasks.length + ' tugas dari Google Sheets', 'success');
-                    alert('Data Kanban berhasil dimuat dari Google Sheets!');
+                    addLogEntry('✓ Berhasil memuat ' + tasks.length + ' tugas dari Google Sheets', 'success');
+                    alert('Berhasil memuat ' + tasks.length + ' tugas dari Google Sheets!');
                 } else {
-                    throw new Error(result.error || 'Data tidak valid');
+                    throw new Error(result.error || result.message || 'Gagal memuat data');
                 }
             } catch (error) {
-                addLogEntry('Gagal memuat data: ' + error.message, 'error');
-                alert('Gagal memuat data. Pastikan Web App sudah di-deploy dengan benar.\n\nError: ' + error.message);
+                addLogEntry('✗ Gagal memuat: ' + error.message, 'error');
+                alert('Gagal memuat data: ' + error.message);
+            }
+        }
+
+        async function loadDailyFromSheet() {
+            if (!gsheetSettings.webAppUrl) {
+                return; // Silent fail for auto-load
+            }
+            
+            try {
+                const today = new Date().toLocaleDateString('id-ID');
+                const response = await fetch(gsheetSettings.webAppUrl + '?type=daily&date=' + encodeURIComponent(today), {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    // Load checklist
+                    const items = document.querySelectorAll('.checklist-item');
+                    result.data.checklist.forEach((checked, index) => {
+                        if (items[index]) {
+                            if (checked) {
+                                items[index].classList.add('checked');
+                            } else {
+                                items[index].classList.remove('checked');
+                            }
+                        }
+                    });
+                    updateProgress();
+                    
+                    // Load reflections
+                    const textareas = document.querySelectorAll('.reflection-textarea');
+                    if (result.data.reflections) {
+                        textareas[0].value = result.data.reflections.good || '';
+                        textareas[1].value = result.data.reflections.improve || '';
+                        textareas[2].value = result.data.reflections.gratitude || '';
+                        textareas[3].value = result.data.reflections.sedona || '';
+                    }
+                    
+                    saveToLocalStorage();
+                    addLogEntry('✓ Data hari ini dimuat dari Google Sheets', 'success');
+                }
+            } catch (error) {
+                console.log('Auto-load daily failed:', error);
             }
         }
 
         async function syncPairwiseToSheet() {
             if (!gsheetSettings.webAppUrl) {
-                alert('Silakan setup Google Sheets terlebih dahulu di tab Settings');
+                alert('Silakan setup Google Sheets terlebih dahulu di tab Google Sheets');
                 return;
             }
             
@@ -3649,17 +3723,23 @@ function getDailyData(ss, date) {
             try {
                 addLogEntry('Mengirim hasil Pairwise...', '');
                 
-                await fetch(gsheetSettings.webAppUrl, {
+                const response = await fetch(gsheetSettings.webAppUrl, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    redirect: 'follow',
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(data)
                 });
                 
-                addLogEntry('Hasil Pairwise berhasil disync ke Google Sheets', 'success');
-                alert('Hasil prioritas berhasil disimpan ke Google Sheets!');
+                const result = await response.json();
+                
+                if (result.success) {
+                    addLogEntry('✓ Hasil Pairwise tersimpan', 'success');
+                    alert('Hasil prioritas berhasil disimpan ke Google Sheets!');
+                } else {
+                    throw new Error(result.error || result.message || 'Gagal menyimpan');
+                }
             } catch (error) {
-                addLogEntry('Gagal sync Pairwise: ' + error.message, 'error');
+                addLogEntry('✗ Gagal sync Pairwise: ' + error.message, 'error');
                 alert('Gagal menyimpan: ' + error.message);
             }
         }
