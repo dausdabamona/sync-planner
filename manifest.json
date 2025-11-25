@@ -1,0 +1,59 @@
+{
+    "name": "Sync Planner + Kanban",
+    "short_name": "Sync Planner",
+    "description": "Integrasi Perencanaan Harian Islami & Manajemen Tugas dengan Kanban Board",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#0f172a",
+    "orientation": "any",
+    "scope": "/",
+    "lang": "id",
+    "categories": ["productivity", "lifestyle"],
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><text y='.9em' x='50' text-anchor='middle' font-size='60' dy='25'>🎯</text></svg>",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        },
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%230f172a'/><text y='.9em' x='96' text-anchor='middle' font-size='100' dy='55'>🎯</text></svg>",
+            "sizes": "192x192",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%230f172a'/><text y='.9em' x='256' text-anchor='middle' font-size='280' dy='140'>🎯</text></svg>",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Planner",
+            "short_name": "Planner",
+            "description": "Buka Sync Planner",
+            "url": "/?tab=planner",
+            "icons": [{ "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><text y='.9em' font-size='80'>📅</text></svg>", "sizes": "96x96" }]
+        },
+        {
+            "name": "Pomodoro",
+            "short_name": "Pomodoro",
+            "description": "Buka Pomodoro Timer",
+            "url": "/?tab=pomodoro",
+            "icons": [{ "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><text y='.9em' font-size='80'>🍅</text></svg>", "sizes": "96x96" }]
+        },
+        {
+            "name": "Kanban",
+            "short_name": "Kanban",
+            "description": "Buka Kanban Board",
+            "url": "/?tab=kanban",
+            "icons": [{ "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><text y='.9em' font-size='80'>📋</text></svg>", "sizes": "96x96" }]
+        }
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false
+}
