@@ -1770,6 +1770,462 @@
         .icon-morning { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; }
         .icon-work { background: linear-gradient(135deg, #059669, #10b981); color: white; }
         .icon-evening { background: linear-gradient(135deg, #7c3aed, #a78bfa); color: white; }
+
+        /* ==================== POMODORO TIMER STYLES ==================== */
+        .pomodoro-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .pomodoro-main {
+            text-align: center;
+            padding: 40px 30px;
+        }
+
+        .timer-display {
+            margin-bottom: 30px;
+        }
+
+        .timer-time {
+            font-size: 6rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            font-family: 'Consolas', 'Monaco', monospace;
+            letter-spacing: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 500px) {
+            .timer-time {
+                font-size: 4rem;
+            }
+        }
+
+        .timer-label {
+            font-size: 1.5rem;
+            color: var(--gray-600);
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .timer-session {
+            display: inline-block;
+            padding: 8px 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .timer-btn {
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timer-btn-start {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .timer-btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .timer-btn-pause {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .timer-btn-pause:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+        }
+
+        .timer-btn-reset {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .timer-btn-reset:hover {
+            background: var(--gray-300);
+        }
+
+        .timer-btn-skip {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .timer-btn-skip:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 12px 25px;
+            border: 2px solid var(--gray-200);
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .mode-btn.active.work {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-color: #ef4444;
+        }
+
+        .mode-btn.active.short-break {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: #10b981;
+        }
+
+        .mode-btn.active.long-break {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-color: #3b82f6;
+        }
+
+        .pomodoro-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid var(--gray-100);
+        }
+
+        @media (max-width: 600px) {
+            .pomodoro-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 20px 15px;
+            background: var(--gray-50);
+            border-radius: 12px;
+        }
+
+        .stat-box-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .stat-box-label {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            margin-top: 5px;
+        }
+
+        .pomodoro-settings {
+            padding: 25px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .setting-item {
+            text-align: center;
+        }
+
+        .setting-item label {
+            display: block;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 10px;
+        }
+
+        .setting-item input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .setting-item input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .setting-item span {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-top: 5px;
+        }
+
+        .sound-settings {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid var(--gray-100);
+        }
+
+        .sound-setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: var(--gray-50);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .sound-setting-row label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .volume-slider {
+            width: 120px;
+            cursor: pointer;
+        }
+
+        .test-sound-btn {
+            padding: 8px 15px;
+            background: var(--gray-200);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .test-sound-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .deep-work-sessions {
+            margin-top: 25px;
+        }
+
+        .session-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: var(--gray-50);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .session-card:hover {
+            transform: translateX(5px);
+        }
+
+        .session-card.completed {
+            background: #ecfdf5;
+            border-left-color: var(--success);
+        }
+
+        .session-card.active {
+            background: #fef3c7;
+            border-left-color: var(--warning);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+        }
+
+        .session-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .session-number {
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .session-card.completed .session-number {
+            background: var(--success);
+        }
+
+        .session-details h4 {
+            color: var(--gray-900);
+            margin-bottom: 3px;
+        }
+
+        .session-details p {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+        }
+
+        .session-action {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .session-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        .status-active {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .start-session-btn {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .start-session-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .start-session-btn:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+        }
+
+        /* Timer ring animation */
+        .timer-ring {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 30px;
+        }
+
+        .timer-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .timer-ring-bg {
+            fill: none;
+            stroke: var(--gray-200);
+            stroke-width: 8;
+        }
+
+        .timer-ring-progress {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear;
+        }
+
+        .timer-ring-progress.work {
+            stroke: #ef4444;
+        }
+
+        .timer-ring-progress.short-break {
+            stroke: #10b981;
+        }
+
+        .timer-ring-progress.long-break {
+            stroke: #3b82f6;
+        }
+
+        .timer-ring-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .current-task-display {
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .current-task-display h4 {
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .current-task-display p {
+            color: var(--gray-800);
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -1781,6 +2237,7 @@
 
         <nav class="nav-tabs">
             <button class="nav-tab active" onclick="switchTab('planner')">📅 Sync Planner</button>
+            <button class="nav-tab" onclick="switchTab('pomodoro')">🍅 Pomodoro</button>
             <button class="nav-tab" onclick="switchTab('pairwise')">⚖️ Prioritas Fokus</button>
             <button class="nav-tab" onclick="switchTab('kanban')">📋 Kanban Board</button>
             <button class="nav-tab" onclick="switchTab('settings')">⚙️ Google Sheets</button>
@@ -1963,6 +2420,219 @@
                     <div class="reflection-group">
                         <label class="reflection-label">💭 Sedona Release:</label>
                         <textarea class="reflection-textarea" placeholder="Emosi yang perlu dilepaskan...&#10;Bisakah saya melepaskannya? Ya/Tidak&#10;Kapan? Sekarang."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- POMODORO TIMER TAB -->
+        <div id="pomodoro-tab" class="tab-content">
+            <div class="pomodoro-container">
+                <!-- Main Timer Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">🍅</div>
+                        <h2 class="card-title">Pomodoro Timer - Deep Work</h2>
+                    </div>
+                    
+                    <div class="pomodoro-main">
+                        <!-- Mode Selector -->
+                        <div class="mode-selector">
+                            <button class="mode-btn work active" onclick="setTimerMode('work')">🎯 Deep Work</button>
+                            <button class="mode-btn short-break" onclick="setTimerMode('shortBreak')">☕ Istirahat Pendek</button>
+                            <button class="mode-btn long-break" onclick="setTimerMode('longBreak')">🌴 Istirahat Panjang</button>
+                        </div>
+
+                        <!-- Timer Ring Display -->
+                        <div class="timer-ring">
+                            <svg width="280" height="280">
+                                <circle class="timer-ring-bg" cx="140" cy="140" r="130"></circle>
+                                <circle class="timer-ring-progress work" id="timer-progress" cx="140" cy="140" r="130" 
+                                    stroke-dasharray="816.81" stroke-dashoffset="0"></circle>
+                            </svg>
+                            <div class="timer-ring-content">
+                                <div class="timer-time" id="timer-display">25:00</div>
+                                <div class="timer-label" id="timer-mode-label">Deep Work</div>
+                            </div>
+                        </div>
+
+                        <!-- Timer Controls -->
+                        <div class="timer-controls">
+                            <button class="timer-btn timer-btn-start" id="btn-timer-start" onclick="startTimer()">
+                                <span>▶</span> Mulai
+                            </button>
+                            <button class="timer-btn timer-btn-pause" id="btn-timer-pause" onclick="pauseTimer()" style="display: none;">
+                                <span>⏸</span> Pause
+                            </button>
+                            <button class="timer-btn timer-btn-reset" onclick="resetTimer()">
+                                <span>↺</span> Reset
+                            </button>
+                            <button class="timer-btn timer-btn-skip" onclick="skipTimer()">
+                                <span>⏭</span> Skip
+                            </button>
+                        </div>
+
+                        <!-- Current Task Display -->
+                        <div class="current-task-display" id="current-task-display" style="display: none;">
+                            <h4>📌 Sedang Dikerjakan:</h4>
+                            <p id="current-task-name">-</p>
+                        </div>
+
+                        <!-- Session Info -->
+                        <div class="timer-session" id="session-info">
+                            Sesi 1 dari 4 🍅
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="pomodoro-stats">
+                            <div class="stat-box">
+                                <div class="stat-box-value" id="stat-pomodoros">0</div>
+                                <div class="stat-box-label">Pomodoro Hari Ini</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-box-value" id="stat-focus-time">0m</div>
+                                <div class="stat-box-label">Waktu Fokus</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-box-value" id="stat-breaks">0</div>
+                                <div class="stat-box-label">Istirahat</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-box-value" id="stat-streak">0</div>
+                                <div class="stat-box-label">Streak 🔥</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Work Sessions Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-work">💼</div>
+                        <h2 class="card-title">Deep Work Sessions Hari Ini</h2>
+                    </div>
+                    
+                    <div class="deep-work-sessions" id="deep-work-sessions">
+                        <div class="session-card" data-session="1">
+                            <div class="session-info">
+                                <div class="session-number">1</div>
+                                <div class="session-details">
+                                    <h4>Deep Work Session 1</h4>
+                                    <p>08:00 - 10:00 | Tugas Prioritas Tinggi</p>
+                                </div>
+                            </div>
+                            <div class="session-action">
+                                <span class="session-status status-pending" id="session-status-1">Menunggu</span>
+                                <button class="start-session-btn" onclick="startDeepWorkSession(1)">Mulai</button>
+                            </div>
+                        </div>
+                        
+                        <div class="session-card" data-session="2">
+                            <div class="session-info">
+                                <div class="session-number">2</div>
+                                <div class="session-details">
+                                    <h4>Deep Work Session 2</h4>
+                                    <p>10:30 - 12:00 | Meeting & Kolaborasi</p>
+                                </div>
+                            </div>
+                            <div class="session-action">
+                                <span class="session-status status-pending" id="session-status-2">Menunggu</span>
+                                <button class="start-session-btn" onclick="startDeepWorkSession(2)">Mulai</button>
+                            </div>
+                        </div>
+                        
+                        <div class="session-card" data-session="3">
+                            <div class="session-info">
+                                <div class="session-number">3</div>
+                                <div class="session-details">
+                                    <h4>Deep Work Session 3</h4>
+                                    <p>13:30 - 15:30 | Administrative Tasks</p>
+                                </div>
+                            </div>
+                            <div class="session-action">
+                                <span class="session-status status-pending" id="session-status-3">Menunggu</span>
+                                <button class="start-session-btn" onclick="startDeepWorkSession(3)">Mulai</button>
+                            </div>
+                        </div>
+
+                        <div class="session-card" data-session="4">
+                            <div class="session-info">
+                                <div class="session-number">4</div>
+                                <div class="session-details">
+                                    <h4>Deep Work Session 4</h4>
+                                    <p>16:00 - 17:00 | Review & Planning</p>
+                                </div>
+                            </div>
+                            <div class="session-action">
+                                <span class="session-status status-pending" id="session-status-4">Menunggu</span>
+                                <button class="start-session-btn" onclick="startDeepWorkSession(4)">Mulai</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #6b7280, #9ca3af);">⚙️</div>
+                        <h2 class="card-title">Pengaturan Timer</h2>
+                    </div>
+                    
+                    <div class="pomodoro-settings">
+                        <div class="settings-grid">
+                            <div class="setting-item">
+                                <label>🎯 Deep Work</label>
+                                <input type="number" id="setting-work" value="25" min="1" max="90" onchange="updateTimerSettings()">
+                                <span>menit</span>
+                            </div>
+                            <div class="setting-item">
+                                <label>☕ Istirahat Pendek</label>
+                                <input type="number" id="setting-short-break" value="5" min="1" max="30" onchange="updateTimerSettings()">
+                                <span>menit</span>
+                            </div>
+                            <div class="setting-item">
+                                <label>🌴 Istirahat Panjang</label>
+                                <input type="number" id="setting-long-break" value="15" min="1" max="60" onchange="updateTimerSettings()">
+                                <span>menit</span>
+                            </div>
+                        </div>
+
+                        <div class="sound-settings">
+                            <h4 style="margin-bottom: 15px;">🔔 Pengaturan Alarm</h4>
+                            
+                            <div class="sound-setting-row">
+                                <label>
+                                    <input type="checkbox" id="sound-enabled" checked onchange="updateSoundSettings()">
+                                    <span>Aktifkan Suara Alarm</span>
+                                </label>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="range" class="volume-slider" id="sound-volume" min="0" max="100" value="70" onchange="updateSoundSettings()">
+                                    <button class="test-sound-btn" onclick="testAlarmSound()">🔊 Test</button>
+                                </div>
+                            </div>
+                            
+                            <div class="sound-setting-row">
+                                <label>
+                                    <input type="checkbox" id="notification-enabled" checked onchange="updateSoundSettings()">
+                                    <span>Notifikasi Browser</span>
+                                </label>
+                                <button class="test-sound-btn" onclick="requestNotificationPermission()">🔔 Izinkan</button>
+                            </div>
+
+                            <div class="sound-setting-row">
+                                <label>
+                                    <input type="checkbox" id="auto-start-break" checked onchange="updateSoundSettings()">
+                                    <span>Auto-start Istirahat</span>
+                                </label>
+                            </div>
+
+                            <div class="sound-setting-row">
+                                <label>
+                                    <input type="checkbox" id="auto-start-work" onchange="updateSoundSettings()">
+                                    <span>Auto-start Deep Work setelah Istirahat</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3424,6 +4094,380 @@ function getDailyData(ss, date) {
             }
         });
 
+        // ==================== POMODORO TIMER ====================
+        let pomodoroState = {
+            mode: 'work', // work, shortBreak, longBreak
+            timeLeft: 25 * 60, // in seconds
+            isRunning: false,
+            interval: null,
+            currentSession: 1,
+            pomodorosCompleted: 0,
+            totalFocusTime: 0,
+            breaksCompleted: 0,
+            streak: 0,
+            currentDeepWorkSession: null
+        };
+
+        let pomodoroSettings = {
+            workDuration: 25,
+            shortBreakDuration: 5,
+            longBreakDuration: 15,
+            soundEnabled: true,
+            volume: 0.7,
+            notificationEnabled: true,
+            autoStartBreak: true,
+            autoStartWork: false
+        };
+
+        // Audio context for alarm
+        let audioContext = null;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playAlarmSound() {
+            if (!pomodoroSettings.soundEnabled) return;
+            
+            initAudio();
+            
+            const duration = 0.5;
+            const frequency = pomodoroState.mode === 'work' ? 800 : 600;
+            
+            // Play 3 beeps
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(pomodoroSettings.volume, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + duration);
+                }, i * 600);
+            }
+        }
+
+        function testAlarmSound() {
+            initAudio();
+            playAlarmSound();
+        }
+
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        alert('Notifikasi diaktifkan!');
+                        new Notification('Sync Planner', {
+                            body: 'Notifikasi berhasil diaktifkan 🍅',
+                            icon: '🍅'
+                        });
+                    } else {
+                        alert('Notifikasi ditolak. Anda bisa mengaktifkannya di pengaturan browser.');
+                    }
+                });
+            } else {
+                alert('Browser tidak mendukung notifikasi');
+            }
+        }
+
+        function showNotification(title, body) {
+            if (!pomodoroSettings.notificationEnabled) return;
+            
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: '🍅',
+                    tag: 'pomodoro',
+                    requireInteraction: true
+                });
+            }
+        }
+
+        function setTimerMode(mode) {
+            pomodoroState.mode = mode;
+            pomodoroState.isRunning = false;
+            clearInterval(pomodoroState.interval);
+            
+            // Update button states
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.mode-btn.${mode === 'shortBreak' ? 'short-break' : mode === 'longBreak' ? 'long-break' : mode}`).classList.add('active');
+            
+            // Set time based on mode
+            switch(mode) {
+                case 'work':
+                    pomodoroState.timeLeft = pomodoroSettings.workDuration * 60;
+                    document.getElementById('timer-mode-label').textContent = 'Deep Work';
+                    break;
+                case 'shortBreak':
+                    pomodoroState.timeLeft = pomodoroSettings.shortBreakDuration * 60;
+                    document.getElementById('timer-mode-label').textContent = 'Istirahat Pendek';
+                    break;
+                case 'longBreak':
+                    pomodoroState.timeLeft = pomodoroSettings.longBreakDuration * 60;
+                    document.getElementById('timer-mode-label').textContent = 'Istirahat Panjang';
+                    break;
+            }
+            
+            updateTimerDisplay();
+            updateTimerButtons();
+            updateProgressRing();
+        }
+
+        function startTimer() {
+            if (pomodoroState.isRunning) return;
+            
+            initAudio(); // Initialize audio on user interaction
+            pomodoroState.isRunning = true;
+            updateTimerButtons();
+            
+            pomodoroState.interval = setInterval(() => {
+                pomodoroState.timeLeft--;
+                
+                if (pomodoroState.mode === 'work') {
+                    pomodoroState.totalFocusTime++;
+                }
+                
+                updateTimerDisplay();
+                updateProgressRing();
+                
+                if (pomodoroState.timeLeft <= 0) {
+                    timerComplete();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            pomodoroState.isRunning = false;
+            clearInterval(pomodoroState.interval);
+            updateTimerButtons();
+        }
+
+        function resetTimer() {
+            pomodoroState.isRunning = false;
+            clearInterval(pomodoroState.interval);
+            setTimerMode(pomodoroState.mode);
+        }
+
+        function skipTimer() {
+            if (confirm('Skip sesi ini?')) {
+                timerComplete();
+            }
+        }
+
+        function timerComplete() {
+            pomodoroState.isRunning = false;
+            clearInterval(pomodoroState.interval);
+            
+            playAlarmSound();
+            
+            if (pomodoroState.mode === 'work') {
+                pomodoroState.pomodorosCompleted++;
+                pomodoroState.streak++;
+                pomodoroState.currentSession++;
+                
+                // Update deep work session status
+                if (pomodoroState.currentDeepWorkSession) {
+                    const statusEl = document.getElementById(`session-status-${pomodoroState.currentDeepWorkSession}`);
+                    if (statusEl) {
+                        statusEl.textContent = 'Selesai';
+                        statusEl.className = 'session-status status-completed';
+                    }
+                    document.querySelector(`[data-session="${pomodoroState.currentDeepWorkSession}"]`).classList.remove('active');
+                    document.querySelector(`[data-session="${pomodoroState.currentDeepWorkSession}"]`).classList.add('completed');
+                }
+                
+                showNotification('🍅 Pomodoro Selesai!', 'Saatnya istirahat. Kamu sudah menyelesaikan ' + pomodoroState.pomodorosCompleted + ' pomodoro hari ini!');
+                
+                // Determine break type
+                if (pomodoroState.currentSession > 4) {
+                    pomodoroState.currentSession = 1;
+                    setTimerMode('longBreak');
+                } else {
+                    setTimerMode('shortBreak');
+                }
+                
+                if (pomodoroSettings.autoStartBreak) {
+                    setTimeout(() => startTimer(), 1000);
+                }
+            } else {
+                pomodoroState.breaksCompleted++;
+                showNotification('☕ Istirahat Selesai!', 'Waktunya kembali fokus!');
+                
+                setTimerMode('work');
+                
+                if (pomodoroSettings.autoStartWork) {
+                    setTimeout(() => startTimer(), 1000);
+                }
+            }
+            
+            updatePomodoroStats();
+            savePomodoroState();
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(pomodoroState.timeLeft / 60);
+            const seconds = pomodoroState.timeLeft % 60;
+            document.getElementById('timer-display').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update page title
+            document.title = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} - Sync Planner`;
+            
+            // Update session info
+            document.getElementById('session-info').textContent = 
+                `Sesi ${pomodoroState.currentSession} dari 4 ${'🍅'.repeat(Math.min(pomodoroState.currentSession, 4))}`;
+        }
+
+        function updateTimerButtons() {
+            const startBtn = document.getElementById('btn-timer-start');
+            const pauseBtn = document.getElementById('btn-timer-pause');
+            
+            if (pomodoroState.isRunning) {
+                startBtn.style.display = 'none';
+                pauseBtn.style.display = 'flex';
+            } else {
+                startBtn.style.display = 'flex';
+                pauseBtn.style.display = 'none';
+            }
+        }
+
+        function updateProgressRing() {
+            const progress = document.getElementById('timer-progress');
+            const totalTime = pomodoroState.mode === 'work' ? pomodoroSettings.workDuration * 60 :
+                              pomodoroState.mode === 'shortBreak' ? pomodoroSettings.shortBreakDuration * 60 :
+                              pomodoroSettings.longBreakDuration * 60;
+            
+            const circumference = 2 * Math.PI * 130; // r = 130
+            const offset = circumference * (1 - pomodoroState.timeLeft / totalTime);
+            
+            progress.style.strokeDashoffset = offset;
+            
+            // Update color based on mode
+            progress.classList.remove('work', 'short-break', 'long-break');
+            progress.classList.add(pomodoroState.mode === 'shortBreak' ? 'short-break' : 
+                                   pomodoroState.mode === 'longBreak' ? 'long-break' : 'work');
+        }
+
+        function updatePomodoroStats() {
+            document.getElementById('stat-pomodoros').textContent = pomodoroState.pomodorosCompleted;
+            
+            const focusMinutes = Math.floor(pomodoroState.totalFocusTime / 60);
+            document.getElementById('stat-focus-time').textContent = focusMinutes + 'm';
+            
+            document.getElementById('stat-breaks').textContent = pomodoroState.breaksCompleted;
+            document.getElementById('stat-streak').textContent = pomodoroState.streak;
+        }
+
+        function updateTimerSettings() {
+            pomodoroSettings.workDuration = parseInt(document.getElementById('setting-work').value) || 25;
+            pomodoroSettings.shortBreakDuration = parseInt(document.getElementById('setting-short-break').value) || 5;
+            pomodoroSettings.longBreakDuration = parseInt(document.getElementById('setting-long-break').value) || 15;
+            
+            if (!pomodoroState.isRunning) {
+                setTimerMode(pomodoroState.mode);
+            }
+            
+            savePomodoroSettings();
+        }
+
+        function updateSoundSettings() {
+            pomodoroSettings.soundEnabled = document.getElementById('sound-enabled').checked;
+            pomodoroSettings.volume = document.getElementById('sound-volume').value / 100;
+            pomodoroSettings.notificationEnabled = document.getElementById('notification-enabled').checked;
+            pomodoroSettings.autoStartBreak = document.getElementById('auto-start-break').checked;
+            pomodoroSettings.autoStartWork = document.getElementById('auto-start-work').checked;
+            
+            savePomodoroSettings();
+        }
+
+        function startDeepWorkSession(sessionNum) {
+            pomodoroState.currentDeepWorkSession = sessionNum;
+            
+            // Update UI
+            document.querySelectorAll('.session-card').forEach(card => card.classList.remove('active'));
+            document.querySelector(`[data-session="${sessionNum}"]`).classList.add('active');
+            
+            const statusEl = document.getElementById(`session-status-${sessionNum}`);
+            statusEl.textContent = 'Aktif';
+            statusEl.className = 'session-status status-active';
+            
+            // Show current task display
+            document.getElementById('current-task-display').style.display = 'block';
+            document.getElementById('current-task-name').textContent = `Deep Work Session ${sessionNum}`;
+            
+            // Reset and start timer
+            setTimerMode('work');
+            startTimer();
+            
+            // Switch to timer view (scroll up)
+            document.querySelector('.pomodoro-main').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function savePomodoroSettings() {
+            localStorage.setItem('pomodoroSettings', JSON.stringify(pomodoroSettings));
+        }
+
+        function loadPomodoroSettings() {
+            const saved = localStorage.getItem('pomodoroSettings');
+            if (saved) {
+                pomodoroSettings = { ...pomodoroSettings, ...JSON.parse(saved) };
+                
+                document.getElementById('setting-work').value = pomodoroSettings.workDuration;
+                document.getElementById('setting-short-break').value = pomodoroSettings.shortBreakDuration;
+                document.getElementById('setting-long-break').value = pomodoroSettings.longBreakDuration;
+                document.getElementById('sound-enabled').checked = pomodoroSettings.soundEnabled;
+                document.getElementById('sound-volume').value = pomodoroSettings.volume * 100;
+                document.getElementById('notification-enabled').checked = pomodoroSettings.notificationEnabled;
+                document.getElementById('auto-start-break').checked = pomodoroSettings.autoStartBreak;
+                document.getElementById('auto-start-work').checked = pomodoroSettings.autoStartWork;
+            }
+        }
+
+        function savePomodoroState() {
+            const today = new Date().toLocaleDateString('id-ID');
+            const stateToSave = {
+                date: today,
+                pomodorosCompleted: pomodoroState.pomodorosCompleted,
+                totalFocusTime: pomodoroState.totalFocusTime,
+                breaksCompleted: pomodoroState.breaksCompleted,
+                streak: pomodoroState.streak
+            };
+            localStorage.setItem('pomodoroState', JSON.stringify(stateToSave));
+        }
+
+        function loadPomodoroState() {
+            const saved = localStorage.getItem('pomodoroState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                const today = new Date().toLocaleDateString('id-ID');
+                
+                // Only load if same day
+                if (state.date === today) {
+                    pomodoroState.pomodorosCompleted = state.pomodorosCompleted || 0;
+                    pomodoroState.totalFocusTime = state.totalFocusTime || 0;
+                    pomodoroState.breaksCompleted = state.breaksCompleted || 0;
+                    pomodoroState.streak = state.streak || 0;
+                    updatePomodoroStats();
+                }
+            }
+        }
+
+        function initPomodoro() {
+            loadPomodoroSettings();
+            loadPomodoroState();
+            setTimerMode('work');
+        }
+
         // ==================== GOOGLE SHEETS INTEGRATION ====================
         let gsheetSettings = {
             webAppUrl: '',
@@ -3849,6 +4893,7 @@ function getDailyData(ss, date) {
         loadFromLocalStorage();
         loadPairwiseFromLocalStorage();
         loadGSheetSettings();
+        initPomodoro();
     </script>
 </body>
 </html>
