@@ -1,7 +1,7 @@
 {
     "name": "Sync Planner + Kanban",
     "short_name": "Sync Planner",
-    "description": "Integrasi Perencanaan Harian Islami & Manajemen Tugas dengan Kanban Board",
+    "description": "Integrasi Perencanaan Harian Islami & Manajemen Tugas dengan Kanban Board - Auto Sync & Progress Tracking",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#0f172a",
@@ -52,6 +52,13 @@
             "description": "Buka Kanban Board",
             "url": "/?tab=kanban",
             "icons": [{ "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><text y='.9em' font-size='80'>📋</text></svg>", "sizes": "96x96" }]
+        },
+        {
+            "name": "Progress",
+            "short_name": "Progress",
+            "description": "Lihat Rekap Progres",
+            "url": "/?tab=progress",
+            "icons": [{ "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><text y='.9em' font-size='80'>📊</text></svg>", "sizes": "96x96" }]
         }
     ],
     "related_applications": [],

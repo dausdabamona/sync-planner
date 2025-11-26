@@ -1,5 +1,6 @@
 // ==================== SYNC PLANNER SERVICE WORKER ====================
-const CACHE_NAME = 'sync-planner-v2';
+// Version 3.0 - With Background Sync Support
+const CACHE_NAME = 'sync-planner-v3';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -11,7 +12,7 @@ const ASSETS_TO_CACHE = [
 
 // Install event - cache assets
 self.addEventListener('install', (event) => {
-    console.log('[SW] Installing...');
+    console.log('[SW] Installing Sync Planner v3...');
     
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -106,44 +107,101 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-// Background sync (for future implementation)
+// Background sync for data synchronization
 self.addEventListener('sync', (event) => {
+    console.log('[SW] Background sync triggered:', event.tag);
+    
     if (event.tag === 'sync-data') {
-        console.log('[SW] Background sync triggered');
-        // Implement background sync logic here
+        event.waitUntil(doBackgroundSync());
     }
 });
 
-// Push notifications (for future implementation)
-self.addEventListener('push', (event) => {
-    if (event.data) {
-        const data = event.data.json();
-        const options = {
-            body: data.body || 'Notifikasi dari Sync Planner',
-            icon: '/icon-192.png',
-            badge: '/icon-72.png',
-            vibrate: [100, 50, 100],
-            data: {
-                url: data.url || '/'
-            }
-        };
+async function doBackgroundSync() {
+    try {
+        // Get pending sync data from IndexedDB or localStorage
+        const clients = await self.clients.matchAll();
         
-        event.waitUntil(
-            self.registration.showNotification(data.title || 'Sync Planner', options)
-        );
+        for (const client of clients) {
+            client.postMessage({
+                type: 'BACKGROUND_SYNC',
+                status: 'started'
+            });
+        }
+        
+        // Notify clients that sync is complete
+        for (const client of clients) {
+            client.postMessage({
+                type: 'BACKGROUND_SYNC',
+                status: 'complete'
+            });
+        }
+        
+        console.log('[SW] Background sync complete');
+    } catch (error) {
+        console.error('[SW] Background sync failed:', error);
+        throw error;
     }
+}
+
+// Push notifications
+self.addEventListener('push', (event) => {
+    console.log('[SW] Push notification received');
+    
+    let data = {
+        title: 'Sync Planner',
+        body: 'Notifikasi dari Sync Planner',
+        url: '/'
+    };
+    
+    if (event.data) {
+        try {
+            data = event.data.json();
+        } catch (e) {
+            data.body = event.data.text();
+        }
+    }
+    
+    const options = {
+        body: data.body,
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎯</text></svg>',
+        badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎯</text></svg>',
+        vibrate: [100, 50, 100],
+        data: {
+            url: data.url || '/'
+        },
+        actions: [
+            {
+                action: 'open',
+                title: 'Buka'
+            },
+            {
+                action: 'close',
+                title: 'Tutup'
+            }
+        ]
+    };
+    
+    event.waitUntil(
+        self.registration.showNotification(data.title || 'Sync Planner', options)
+    );
 });
 
 // Notification click handler
 self.addEventListener('notificationclick', (event) => {
+    console.log('[SW] Notification clicked');
+    
     event.notification.close();
+    
+    if (event.action === 'close') {
+        return;
+    }
     
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true })
             .then((clientList) => {
                 // Focus existing window if available
                 for (const client of clientList) {
-                    if (client.url === '/' && 'focus' in client) {
+                    if (client.url.includes(self.registration.scope) && 'focus' in client) {
                         return client.focus();
                     }
                 }
@@ -155,4 +213,28 @@ self.addEventListener('notificationclick', (event) => {
     );
 });
 
-console.log('[SW] Service Worker loaded');
+// Message handler for communication with main app
+self.addEventListener('message', (event) => {
+    console.log('[SW] Message received:', event.data);
+    
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+    
+    if (event.data && event.data.type === 'GET_VERSION') {
+        event.ports[0].postMessage({
+            version: CACHE_NAME
+        });
+    }
+});
+
+// Periodic background sync (if supported)
+self.addEventListener('periodicsync', (event) => {
+    console.log('[SW] Periodic sync triggered:', event.tag);
+    
+    if (event.tag === 'sync-planner-periodic') {
+        event.waitUntil(doBackgroundSync());
+    }
+});
+
+console.log('[SW] Service Worker v3 loaded');

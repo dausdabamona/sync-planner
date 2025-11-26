@@ -1,5 +1,5 @@
 // ==================== SYNC PLANNER - MAIN JAVASCRIPT ====================
-// Version 2.0 - Modular & Improved
+// Version 3.0 - Auto Sync, Pairwise to Kanban, Progress Reports
 
 // ==================== GLOBAL STATE ====================
 const AppState = {
@@ -44,7 +44,8 @@ const AppState = {
         options: [],
         comparisons: [],
         currentIndex: 0,
-        scores: {}
+        scores: {},
+        lastResults: []
     },
     
     // Kanban
@@ -54,10 +55,20 @@ const AppState = {
         draggedTask: null
     },
     
-    // Google Sheets
+    // Google Sheets & Sync
     gsheet: {
         webAppUrl: ''
-    }
+    },
+    sync: {
+        enabled: false,
+        interval: 5,
+        intervalId: null,
+        lastSync: null,
+        isSyncing: false
+    },
+    
+    // Progress History
+    history: []
 };
 
 // ==================== INITIALIZATION ====================
@@ -71,9 +82,10 @@ function initApp() {
     initDate();
     initPomodoro();
     initPWA();
+    initAutoSync();
     renderKanbanTasks();
     updateProgress();
-    console.log('🎯 Sync Planner initialized');
+    console.log('🎯 Sync Planner v3.0 initialized');
 }
 
 // ==================== THEME ====================
@@ -105,26 +117,27 @@ function initDate() {
 
 // ==================== NAVIGATION ====================
 function switchTab(tabName) {
-    // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
     });
     
-    // Deactivate all nav buttons
     document.querySelectorAll('.nav-tab').forEach(btn => {
         btn.classList.remove('active');
     });
     
-    // Show selected tab
     const targetTab = document.getElementById(`${tabName}-tab`);
     if (targetTab) {
         targetTab.classList.add('active');
     }
     
-    // Activate nav button
     const navBtn = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
     if (navBtn) {
         navBtn.classList.add('active');
+    }
+    
+    // Load progress data when switching to progress tab
+    if (tabName === 'progress') {
+        showProgress('week');
     }
 }
 
@@ -133,6 +146,7 @@ function toggleCheck(element) {
     element.classList.toggle('checked');
     updateProgress();
     saveChecklistState();
+    triggerAutoSync();
 }
 
 function updateProgress() {
@@ -172,6 +186,7 @@ function saveReflections() {
         sedona: document.getElementById('reflection-sedona')?.value || ''
     };
     saveToLocalStorage();
+    triggerAutoSync();
 }
 
 function loadReflections() {
@@ -194,7 +209,6 @@ function initPomodoro() {
 function setTimerMode(mode) {
     AppState.timer.mode = mode;
     
-    // Update button states
     document.querySelectorAll('.mode-btn').forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.mode === mode) {
@@ -202,15 +216,11 @@ function setTimerMode(mode) {
         }
     });
     
-    // Update progress ring class
     const progressRing = document.getElementById('timer-progress');
     if (progressRing) {
-        progressRing.className = `timer-ring-progress ${mode.replace('-', '-')}`;
-        progressRing.classList.remove('work', 'short-break', 'long-break');
-        progressRing.classList.add(mode);
+        progressRing.className = `timer-ring-progress ${mode}`;
     }
     
-    // Set time based on mode
     const settings = AppState.timer.settings;
     switch (mode) {
         case 'work':
@@ -287,7 +297,6 @@ function timerComplete() {
         AppState.timer.stats.focusTime += AppState.timer.settings.work;
         AppState.timer.stats.streak++;
         
-        // Check for long break
         if (AppState.timer.currentSession >= 4) {
             AppState.timer.currentSession = 1;
             setTimerMode('long-break');
@@ -306,6 +315,7 @@ function timerComplete() {
     updatePomodoroStats();
     updateSessionInfo();
     saveToLocalStorage();
+    triggerAutoSync();
 }
 
 function updateTimerDisplay() {
@@ -316,7 +326,6 @@ function updateTimerDisplay() {
     document.getElementById('timer-display').textContent = display;
     document.title = `${display} - Sync Planner`;
     
-    // Update progress ring
     const settings = AppState.timer.settings;
     const mode = AppState.timer.mode;
     let totalTime;
@@ -333,7 +342,7 @@ function updateTimerDisplay() {
             break;
     }
     
-    const circumference = 816.81; // 2 * PI * 130
+    const circumference = 816.81;
     const progress = AppState.timer.timeLeft / totalTime;
     const offset = circumference * (1 - progress);
     
@@ -413,34 +422,6 @@ function showNotification(message) {
     alert(message);
 }
 
-function startDeepWorkSession(sessionNum) {
-    // Update session status
-    for (let i = 1; i <= 4; i++) {
-        const statusEl = document.getElementById(`session-status-${i}`);
-        const cardEl = document.querySelector(`.session-card[data-session="${i}"]`);
-        
-        if (i < sessionNum) {
-            statusEl.textContent = 'Selesai';
-            statusEl.className = 'session-status status-completed';
-            cardEl.classList.add('completed');
-            cardEl.classList.remove('active');
-        } else if (i === sessionNum) {
-            statusEl.textContent = 'Aktif';
-            statusEl.className = 'session-status status-active';
-            cardEl.classList.add('active');
-            cardEl.classList.remove('completed');
-        } else {
-            statusEl.textContent = 'Menunggu';
-            statusEl.className = 'session-status status-pending';
-            cardEl.classList.remove('completed', 'active');
-        }
-    }
-    
-    // Start timer
-    setTimerMode('work');
-    startTimer();
-}
-
 // ==================== PAIRWISE COMPARISON ====================
 function handleOptionKeypress(event) {
     if (event.key === 'Enter') {
@@ -513,7 +494,6 @@ function startComparison() {
         return;
     }
     
-    // Generate all pairs
     AppState.pairwise.comparisons = [];
     AppState.pairwise.scores = {};
     
@@ -525,11 +505,9 @@ function startComparison() {
         }
     }
     
-    // Shuffle comparisons
     AppState.pairwise.comparisons.sort(() => Math.random() - 0.5);
     AppState.pairwise.currentIndex = 0;
     
-    // Show comparison card
     document.getElementById('comparison-card').style.display = 'block';
     document.getElementById('results-card').style.display = 'none';
     
@@ -549,7 +527,6 @@ function showCurrentComparison() {
     document.getElementById('option-text-a').textContent = AppState.pairwise.options[a];
     document.getElementById('option-text-b').textContent = AppState.pairwise.options[b];
     
-    // Update progress
     const percentage = (idx / total) * 100;
     document.getElementById('comparison-progress-fill').style.width = `${percentage}%`;
     document.getElementById('comparison-progress-text').textContent = `${idx} / ${total}`;
@@ -578,12 +555,16 @@ function showResults() {
         .map((opt, i) => ({ text: opt, score: AppState.pairwise.scores[i], index: i }))
         .sort((a, b) => b.score - a.score);
     
+    // Store results for later use
+    AppState.pairwise.lastResults = results;
+    
     const container = document.getElementById('results-list');
     container.innerHTML = results.map((item, rank) => {
         const rankClass = rank < 3 ? `rank-${rank + 1}` : '';
+        const priorityLabel = rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : `#${rank + 1}`;
         return `
             <div class="result-item ${rankClass}">
-                <span class="result-rank">${rank + 1}</span>
+                <span class="result-rank">${priorityLabel}</span>
                 <span class="result-text">${escapeHtml(item.text)}</span>
                 <span class="result-score">${item.score} poin</span>
             </div>
@@ -600,6 +581,70 @@ function resetComparison() {
 
 function savePairwiseState() {
     saveToLocalStorage();
+}
+
+// ==================== PAIRWISE TO KANBAN ====================
+function addResultsToKanban() {
+    if (!AppState.pairwise.lastResults || AppState.pairwise.lastResults.length === 0) {
+        alert('Belum ada hasil pairwise!');
+        return;
+    }
+    
+    // Show modal with checkboxes
+    const container = document.getElementById('pairwise-kanban-list');
+    container.innerHTML = AppState.pairwise.lastResults.map((item, rank) => {
+        const priority = rank === 0 ? 'high' : rank <= 2 ? 'medium' : 'low';
+        const priorityLabel = rank === 0 ? '🥇 #1' : rank === 1 ? '🥈 #2' : rank === 2 ? '🥉 #3' : `#${rank + 1}`;
+        return `
+            <label class="pairwise-kanban-item">
+                <input type="checkbox" value="${rank}" data-text="${escapeHtml(item.text)}" data-priority="${priority}" checked>
+                <span class="pairwise-rank">${priorityLabel}</span>
+                <span class="pairwise-text">${escapeHtml(item.text)}</span>
+            </label>
+        `;
+    }).join('');
+    
+    document.getElementById('pairwise-kanban-modal').classList.add('active');
+}
+
+function closePairwiseKanbanModal() {
+    document.getElementById('pairwise-kanban-modal').classList.remove('active');
+}
+
+function confirmAddToKanban() {
+    const checkboxes = document.querySelectorAll('#pairwise-kanban-list input[type="checkbox"]:checked');
+    let added = 0;
+    
+    checkboxes.forEach(cb => {
+        const task = {
+            id: AppState.kanban.taskIdCounter++,
+            title: cb.dataset.text,
+            column: 'todo',
+            priority: cb.dataset.priority,
+            notes: `Dari Pairwise - Ranking #${parseInt(cb.value) + 1}`,
+            link: '',
+            created: new Date().toISOString()
+        };
+        
+        AppState.kanban.tasks.push(task);
+        added++;
+    });
+    
+    closePairwiseKanbanModal();
+    renderKanbanTasks();
+    saveToLocalStorage();
+    triggerAutoSync();
+    
+    // Clear pairwise options after adding
+    if (confirm(`${added} tugas berhasil ditambahkan ke Kanban!\n\nHapus opsi pairwise yang sudah ditambahkan?`)) {
+        AppState.pairwise.options = [];
+        AppState.pairwise.lastResults = [];
+        renderOptionsList();
+        document.getElementById('results-card').style.display = 'none';
+    }
+    
+    // Switch to Kanban tab
+    switchTab('kanban');
 }
 
 // ==================== KANBAN ====================
@@ -631,16 +676,15 @@ function quickAddTask() {
     
     renderKanbanTasks();
     saveToLocalStorage();
+    triggerAutoSync();
 }
 
 function renderKanbanTasks() {
-    // Clear all columns
     ['backlog', 'todo', 'inprogress', 'done'].forEach(col => {
         const container = document.getElementById(`column-${col}`);
         if (container) container.innerHTML = '';
     });
     
-    // Render tasks
     AppState.kanban.tasks.forEach(task => {
         const container = document.getElementById(`column-${task.column}`);
         if (container) {
@@ -670,7 +714,6 @@ function createTaskElement(task) {
         ${task.link ? `<a href="${escapeHtml(task.link)}" target="_blank" class="task-link">🔗 Link</a>` : ''}
     `;
     
-    // Drag events
     div.addEventListener('dragstart', handleDragStart);
     div.addEventListener('dragend', handleDragEnd);
     
@@ -700,7 +743,6 @@ function updateKanbanCounts() {
         if (el) el.textContent = counts[col];
     });
     
-    // Update stats bar
     const total = AppState.kanban.tasks.length;
     const progress = counts.inprogress;
     const done = counts.done;
@@ -736,9 +778,17 @@ function handleDrop(e, column) {
     const task = AppState.kanban.tasks.find(t => t.id === taskId);
     
     if (task) {
+        const oldColumn = task.column;
         task.column = column;
+        
+        // Track completion
+        if (column === 'done' && oldColumn !== 'done') {
+            task.completed = new Date().toISOString();
+        }
+        
         renderKanbanTasks();
         saveToLocalStorage();
+        triggerAutoSync();
     }
 }
 
@@ -767,15 +817,24 @@ function saveTaskEdit() {
     
     if (!task) return;
     
+    const oldColumn = task.column;
+    const newColumn = document.getElementById('edit-task-column').value;
+    
     task.title = document.getElementById('edit-task-title').value.trim();
     task.priority = document.getElementById('edit-task-priority').value;
-    task.column = document.getElementById('edit-task-column').value;
+    task.column = newColumn;
     task.notes = document.getElementById('edit-task-notes').value.trim();
     task.link = document.getElementById('edit-task-link').value.trim();
+    
+    // Track completion
+    if (newColumn === 'done' && oldColumn !== 'done') {
+        task.completed = new Date().toISOString();
+    }
     
     closeTaskModal();
     renderKanbanTasks();
     saveToLocalStorage();
+    triggerAutoSync();
 }
 
 function deleteTask() {
@@ -785,6 +844,7 @@ function deleteTask() {
         closeTaskModal();
         renderKanbanTasks();
         saveToLocalStorage();
+        triggerAutoSync();
     }
 }
 
@@ -793,6 +853,366 @@ function quickDeleteTask(taskId) {
         AppState.kanban.tasks = AppState.kanban.tasks.filter(t => t.id !== taskId);
         renderKanbanTasks();
         saveToLocalStorage();
+        triggerAutoSync();
+    }
+}
+
+// ==================== PROGRESS REPORTS ====================
+function showProgress(period) {
+    // Update button states
+    document.querySelectorAll('.period-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.period === period) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Load progress data
+    if (AppState.gsheet.webAppUrl) {
+        loadProgressFromSheet(period);
+    } else {
+        loadProgressFromLocal(period);
+    }
+}
+
+function loadProgressFromLocal(period) {
+    const now = new Date();
+    let startDate = new Date();
+    
+    switch(period) {
+        case 'week':
+            startDate.setDate(now.getDate() - 7);
+            break;
+        case 'month':
+            startDate.setMonth(now.getMonth() - 1);
+            break;
+        case 'quarter':
+            startDate.setMonth(now.getMonth() - 3);
+            break;
+        case 'year':
+            startDate.setFullYear(now.getFullYear() - 1);
+            break;
+    }
+    
+    // Filter history by period
+    const filteredHistory = AppState.history.filter(entry => {
+        const entryDate = new Date(entry.date.split('/').reverse().join('-'));
+        return entryDate >= startDate;
+    });
+    
+    // Calculate summary
+    let totalPomodoros = 0;
+    let totalFocus = 0;
+    let totalChecklist = 0;
+    let days = 0;
+    
+    filteredHistory.forEach(entry => {
+        totalPomodoros += entry.pomodoros || 0;
+        totalFocus += entry.focusTime || 0;
+        const checked = entry.checklist?.filter(c => c).length || 0;
+        const total = entry.checklist?.length || 10;
+        totalChecklist += (checked / total) * 100;
+        days++;
+    });
+    
+    // Count completed tasks in period
+    let completedTasks = 0;
+    AppState.kanban.tasks.forEach(task => {
+        if (task.column === 'done' && task.completed) {
+            const completedDate = new Date(task.completed);
+            if (completedDate >= startDate) {
+                completedTasks++;
+            }
+        }
+    });
+    
+    // Update UI
+    updateProgressUI({
+        tasksCompleted: completedTasks,
+        totalPomodoros: totalPomodoros,
+        focusHours: Math.round(totalFocus / 60 * 10) / 10,
+        avgChecklist: days > 0 ? Math.round(totalChecklist / days) : 0
+    }, filteredHistory);
+}
+
+async function loadProgressFromSheet(period) {
+    try {
+        showSyncIndicator('Memuat data progres...');
+        
+        const response = await fetch(`${AppState.gsheet.webAppUrl}?type=progress&period=${period}`, {
+            method: 'GET',
+            redirect: 'follow'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+            updateProgressUI(result.data.summary, result.data.days);
+        } else {
+            loadProgressFromLocal(period);
+        }
+        
+        hideSyncIndicator();
+    } catch (error) {
+        console.error('Failed to load progress:', error);
+        loadProgressFromLocal(period);
+        hideSyncIndicator();
+    }
+}
+
+function updateProgressUI(summary, days) {
+    // Update summary stats
+    document.getElementById('summary-tasks-completed').textContent = summary.tasksCompleted || 0;
+    document.getElementById('summary-pomodoros').textContent = summary.totalPomodoros || 0;
+    document.getElementById('summary-focus-hours').textContent = `${summary.focusHours || 0}h`;
+    document.getElementById('summary-checklist-avg').textContent = `${summary.avgChecklist || 0}%`;
+    
+    // Calculate ibadah stats from days data
+    const ibadahStats = calculateIbadahStats(days);
+    updateIbadahUI(ibadahStats);
+    
+    // Render trend chart
+    renderTrendChart(days);
+    
+    // Render history list
+    renderHistoryList(days);
+}
+
+function calculateIbadahStats(days) {
+    if (!days || days.length === 0) {
+        return { tahajud: 0, subuh: 0, dzikirPagi: 0, dzikirPetang: 0, olahraga: 0 };
+    }
+    
+    let tahajud = 0, subuh = 0, dzikirPagi = 0, dzikirPetang = 0, olahraga = 0;
+    const total = days.length;
+    
+    days.forEach(day => {
+        if (day.checklist && day.checklist.length >= 10) {
+            if (day.checklist[0]) tahajud++;
+            if (day.checklist[1]) subuh++;
+            if (day.checklist[2]) dzikirPagi++;
+            if (day.checklist[7]) dzikirPetang++;
+            if (day.checklist[3]) olahraga++;
+        } else if (day.checklistPercent !== undefined) {
+            // From sheet data, use average
+            const pct = day.checklistPercent / 100;
+            tahajud += pct > 0.7 ? 1 : 0;
+            subuh += pct > 0.6 ? 1 : 0;
+            dzikirPagi += pct > 0.5 ? 1 : 0;
+            dzikirPetang += pct > 0.4 ? 1 : 0;
+            olahraga += pct > 0.3 ? 1 : 0;
+        }
+    });
+    
+    return {
+        tahajud: Math.round((tahajud / total) * 100),
+        subuh: Math.round((subuh / total) * 100),
+        dzikirPagi: Math.round((dzikirPagi / total) * 100),
+        dzikirPetang: Math.round((dzikirPetang / total) * 100),
+        olahraga: Math.round((olahraga / total) * 100)
+    };
+}
+
+function updateIbadahUI(stats) {
+    const ibadahItems = [
+        { id: 'tahajud', value: stats.tahajud },
+        { id: 'subuh', value: stats.subuh },
+        { id: 'dzikir-pagi', value: stats.dzikirPagi },
+        { id: 'dzikir-petang', value: stats.dzikirPetang },
+        { id: 'olahraga', value: stats.olahraga }
+    ];
+    
+    ibadahItems.forEach(item => {
+        const fill = document.getElementById(`ibadah-${item.id}`);
+        const pct = document.getElementById(`ibadah-${item.id}-pct`);
+        if (fill) fill.style.width = `${item.value}%`;
+        if (pct) pct.textContent = `${item.value}%`;
+    });
+}
+
+function renderTrendChart(days) {
+    const container = document.getElementById('trend-chart');
+    if (!days || days.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span>📊</span><p>Belum ada data untuk ditampilkan</p></div>';
+        return;
+    }
+    
+    // Simple bar chart using CSS
+    const maxPct = 100;
+    const chartHtml = days.slice(-14).map((day, i) => {
+        const pct = day.checklistPercent || 0;
+        const date = day.date ? day.date.split('/').slice(0, 2).join('/') : `Day ${i + 1}`;
+        const color = pct >= 80 ? 'var(--success)' : pct >= 50 ? 'var(--warning)' : 'var(--danger)';
+        return `
+            <div class="chart-bar-container">
+                <div class="chart-bar" style="height: ${pct}%; background: ${color};" title="${pct}%"></div>
+                <span class="chart-label">${date}</span>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = `<div class="chart-bars">${chartHtml}</div>`;
+}
+
+function renderHistoryList(days) {
+    const container = document.getElementById('history-list');
+    if (!days || days.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span>📊</span><p>Belum ada data riwayat</p></div>';
+        return;
+    }
+    
+    // Show last 10 days
+    const recentDays = days.slice(-10).reverse();
+    
+    container.innerHTML = recentDays.map(day => {
+        const pct = day.checklistPercent || 0;
+        const statusClass = pct >= 80 ? 'success' : pct >= 50 ? 'warning' : 'danger';
+        const pomodoros = day.pomodoros || 0;
+        const focus = day.focusTime || 0;
+        
+        return `
+            <div class="history-item">
+                <div class="history-date">${day.date || 'N/A'}</div>
+                <div class="history-stats">
+                    <span class="history-checklist ${statusClass}">${pct}% checklist</span>
+                    <span class="history-pomodoro">🍅 ${pomodoros}</span>
+                    <span class="history-focus">⏱️ ${focus}m</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ==================== AUTO SYNC ====================
+function initAutoSync() {
+    const autoSyncCheckbox = document.getElementById('auto-sync-enabled');
+    const syncIntervalSelect = document.getElementById('sync-interval');
+    
+    if (autoSyncCheckbox) autoSyncCheckbox.checked = AppState.sync.enabled;
+    if (syncIntervalSelect) syncIntervalSelect.value = AppState.sync.interval;
+    
+    if (AppState.sync.enabled && AppState.gsheet.webAppUrl) {
+        startAutoSync();
+    }
+    
+    updateLastSyncDisplay();
+}
+
+function updateAutoSyncSettings() {
+    AppState.sync.enabled = document.getElementById('auto-sync-enabled').checked;
+    AppState.sync.interval = parseInt(document.getElementById('sync-interval').value);
+    
+    saveToLocalStorage();
+    
+    if (AppState.sync.enabled && AppState.gsheet.webAppUrl) {
+        startAutoSync();
+    } else {
+        stopAutoSync();
+    }
+}
+
+function startAutoSync() {
+    stopAutoSync();
+    
+    const intervalMs = AppState.sync.interval * 60 * 1000;
+    AppState.sync.intervalId = setInterval(() => {
+        performAutoSync();
+    }, intervalMs);
+    
+    console.log(`Auto sync started (every ${AppState.sync.interval} minutes)`);
+}
+
+function stopAutoSync() {
+    if (AppState.sync.intervalId) {
+        clearInterval(AppState.sync.intervalId);
+        AppState.sync.intervalId = null;
+    }
+}
+
+function triggerAutoSync() {
+    // Debounced auto sync on data change
+    if (AppState.sync.enabled && AppState.gsheet.webAppUrl && !AppState.sync.isSyncing) {
+        // Sync after 3 seconds of no changes
+        clearTimeout(AppState.sync.debounceTimer);
+        AppState.sync.debounceTimer = setTimeout(() => {
+            performAutoSync();
+        }, 3000);
+    }
+}
+
+async function performAutoSync() {
+    if (!AppState.gsheet.webAppUrl || AppState.sync.isSyncing) return;
+    
+    AppState.sync.isSyncing = true;
+    showSyncIndicator('Menyinkronkan...');
+    
+    try {
+        const today = new Date().toLocaleDateString('id-ID');
+        
+        const data = {
+            type: 'fullSync',
+            tasks: AppState.kanban.tasks,
+            daily: {
+                date: today,
+                checklist: AppState.checklist,
+                reflections: AppState.reflections,
+                pomodoros: AppState.timer.stats.pomodoros,
+                focusTime: AppState.timer.stats.focusTime
+            }
+        };
+        
+        const response = await fetch(AppState.gsheet.webAppUrl, {
+            method: 'POST',
+            redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            AppState.sync.lastSync = new Date().toISOString();
+            updateLastSyncDisplay();
+            addLogEntry('✓ Auto sync berhasil', 'success');
+        }
+    } catch (error) {
+        console.error('Auto sync failed:', error);
+        addLogEntry('✗ Auto sync gagal: ' + error.message, 'error');
+    } finally {
+        AppState.sync.isSyncing = false;
+        hideSyncIndicator();
+    }
+}
+
+function manualSync() {
+    if (!AppState.gsheet.webAppUrl) {
+        alert('Setup Google Sheets terlebih dahulu!');
+        return;
+    }
+    
+    performAutoSync();
+}
+
+function showSyncIndicator(text = 'Syncing...') {
+    const indicator = document.getElementById('sync-indicator');
+    const textEl = indicator.querySelector('.sync-text');
+    if (textEl) textEl.textContent = text;
+    indicator.classList.add('show');
+}
+
+function hideSyncIndicator() {
+    document.getElementById('sync-indicator').classList.remove('show');
+}
+
+function updateLastSyncDisplay() {
+    const el = document.getElementById('last-sync-time');
+    if (el) {
+        if (AppState.sync.lastSync) {
+            const date = new Date(AppState.sync.lastSync);
+            el.textContent = date.toLocaleString('id-ID');
+        } else {
+            el.textContent = 'Belum pernah';
+        }
     }
 }
 
@@ -803,7 +1223,7 @@ function toggleAppsScript() {
 }
 
 function copyAppsScript() {
-    const code = document.querySelector('.script-code').textContent;
+    const code = document.getElementById('apps-script-content').textContent;
     navigator.clipboard.writeText(code).then(() => {
         alert('Kode berhasil dicopy! Paste ke Google Apps Script editor.');
     }).catch(err => {
@@ -815,6 +1235,10 @@ function saveGSheetSettings() {
     AppState.gsheet.webAppUrl = document.getElementById('gsheet-url').value.trim();
     saveToLocalStorage();
     testConnection();
+    
+    if (AppState.sync.enabled && AppState.gsheet.webAppUrl) {
+        startAutoSync();
+    }
 }
 
 function loadGSheetSettings() {
@@ -865,6 +1289,7 @@ async function syncTasksToSheet() {
     
     try {
         addLogEntry('Mengirim tasks ke Google Sheets...', '');
+        showSyncIndicator('Uploading tasks...');
         
         const response = await fetch(AppState.gsheet.webAppUrl, {
             method: 'POST',
@@ -887,6 +1312,8 @@ async function syncTasksToSheet() {
     } catch (error) {
         addLogEntry('✗ Gagal sync: ' + error.message, 'error');
         alert('Gagal sync: ' + error.message);
+    } finally {
+        hideSyncIndicator();
     }
 }
 
@@ -898,6 +1325,7 @@ async function loadTasksFromSheet() {
     
     try {
         addLogEntry('Memuat tasks dari Google Sheets...', '');
+        showSyncIndicator('Downloading tasks...');
         
         const response = await fetch(`${AppState.gsheet.webAppUrl}?type=tasks`, {
             method: 'GET',
@@ -909,7 +1337,6 @@ async function loadTasksFromSheet() {
         if (result.success && result.data) {
             AppState.kanban.tasks = result.data;
             
-            // Update task ID counter
             if (result.data.length > 0) {
                 const maxId = Math.max(...result.data.map(t => t.id || 0));
                 AppState.kanban.taskIdCounter = maxId + 1;
@@ -926,6 +1353,8 @@ async function loadTasksFromSheet() {
     } catch (error) {
         addLogEntry('✗ Gagal memuat: ' + error.message, 'error');
         alert('Gagal memuat: ' + error.message);
+    } finally {
+        hideSyncIndicator();
     }
 }
 
@@ -937,6 +1366,7 @@ async function syncDailyToSheet() {
     
     try {
         addLogEntry('Mengirim data harian...', '');
+        showSyncIndicator('Uploading daily data...');
         
         const response = await fetch(AppState.gsheet.webAppUrl, {
             method: 'POST',
@@ -946,7 +1376,9 @@ async function syncDailyToSheet() {
                 type: 'daily',
                 date: new Date().toLocaleDateString('id-ID'),
                 checklist: AppState.checklist,
-                reflections: AppState.reflections
+                reflections: AppState.reflections,
+                pomodoros: AppState.timer.stats.pomodoros,
+                focusTime: AppState.timer.stats.focusTime
             })
         });
         
@@ -961,13 +1393,19 @@ async function syncDailyToSheet() {
     } catch (error) {
         addLogEntry('✗ Gagal sync: ' + error.message, 'error');
         alert('Gagal sync: ' + error.message);
+    } finally {
+        hideSyncIndicator();
     }
 }
 
 async function loadDailyFromSheet() {
-    if (!AppState.gsheet.webAppUrl) return;
+    if (!AppState.gsheet.webAppUrl) {
+        alert('Setup Google Sheets terlebih dahulu!');
+        return;
+    }
     
     try {
+        showSyncIndicator('Downloading daily data...');
         const today = new Date().toLocaleDateString('id-ID');
         const response = await fetch(`${AppState.gsheet.webAppUrl}?type=daily&date=${encodeURIComponent(today)}`, {
             method: 'GET',
@@ -977,7 +1415,6 @@ async function loadDailyFromSheet() {
         const result = await response.json();
         
         if (result.success && result.data) {
-            // Load checklist
             const items = document.querySelectorAll('.checklist-item');
             result.data.checklist.forEach((checked, index) => {
                 if (items[index]) {
@@ -990,7 +1427,6 @@ async function loadDailyFromSheet() {
             });
             updateProgress();
             
-            // Load reflections
             if (result.data.reflections) {
                 AppState.reflections = result.data.reflections;
                 loadReflections();
@@ -998,54 +1434,12 @@ async function loadDailyFromSheet() {
             
             saveToLocalStorage();
             addLogEntry('✓ Data hari ini dimuat', 'success');
+            alert('Data harian berhasil dimuat!');
         }
     } catch (error) {
-        console.log('Auto-load daily failed:', error);
-    }
-}
-
-async function syncPairwiseToSheet() {
-    if (!AppState.gsheet.webAppUrl) {
-        alert('Setup Google Sheets terlebih dahulu!');
-        return;
-    }
-    
-    if (Object.keys(AppState.pairwise.scores).length === 0) {
-        alert('Belum ada hasil Pairwise untuk disimpan');
-        return;
-    }
-    
-    // Sort and prepare data
-    const results = AppState.pairwise.options
-        .map((opt, i) => ({ text: opt, score: AppState.pairwise.scores[i] || 0, rank: 0 }))
-        .sort((a, b) => b.score - a.score)
-        .map((item, idx) => ({ ...item, rank: idx + 1 }));
-    
-    try {
-        addLogEntry('Mengirim hasil Pairwise...', '');
-        
-        const response = await fetch(AppState.gsheet.webAppUrl, {
-            method: 'POST',
-            redirect: 'follow',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify({
-                type: 'pairwise',
-                totalComparisons: AppState.pairwise.comparisons.length,
-                results: results
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            addLogEntry('✓ Hasil Pairwise tersimpan', 'success');
-            alert('Hasil prioritas berhasil disimpan!');
-        } else {
-            throw new Error(result.error || 'Gagal menyimpan');
-        }
-    } catch (error) {
-        addLogEntry('✗ Gagal sync: ' + error.message, 'error');
-        alert('Gagal sync: ' + error.message);
+        addLogEntry('✗ Gagal memuat: ' + error.message, 'error');
+    } finally {
+        hideSyncIndicator();
     }
 }
 
@@ -1064,7 +1458,6 @@ function addLogEntry(message, type) {
     
     container.insertBefore(entry, container.firstChild);
     
-    // Keep only last 10 entries
     while (container.children.length > 10) {
         container.removeChild(container.lastChild);
     }
@@ -1073,7 +1466,7 @@ function addLogEntry(message, type) {
 // ==================== DATA MANAGEMENT ====================
 function exportAllData() {
     const data = {
-        version: '2.0',
+        version: '3.0',
         exportDate: new Date().toISOString(),
         theme: AppState.theme,
         checklist: AppState.checklist,
@@ -1090,7 +1483,12 @@ function exportAllData() {
             tasks: AppState.kanban.tasks,
             taskIdCounter: AppState.kanban.taskIdCounter
         },
-        gsheet: AppState.gsheet
+        gsheet: AppState.gsheet,
+        sync: {
+            enabled: AppState.sync.enabled,
+            interval: AppState.sync.interval
+        },
+        history: AppState.history
     };
     
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1124,17 +1522,22 @@ function importAllData(event) {
                 if (data.kanban.taskIdCounter) AppState.kanban.taskIdCounter = data.kanban.taskIdCounter;
             }
             if (data.gsheet) AppState.gsheet = data.gsheet;
+            if (data.sync) {
+                AppState.sync.enabled = data.sync.enabled;
+                AppState.sync.interval = data.sync.interval;
+            }
+            if (data.history) AppState.history = data.history;
             if (data.theme) setTheme(data.theme);
             
             saveToLocalStorage();
             
-            // Reload UI
             loadChecklistState();
             loadReflections();
             loadTimerSettings();
             renderOptionsList();
             renderKanbanTasks();
             loadGSheetSettings();
+            initAutoSync();
             
             alert('Data berhasil diimport!');
         } catch (error) {
@@ -1157,6 +1560,29 @@ function clearAllData() {
 // ==================== LOCAL STORAGE ====================
 function saveToLocalStorage() {
     try {
+        // Save today's data to history
+        const today = new Date().toLocaleDateString('id-ID');
+        const existingIndex = AppState.history.findIndex(h => h.date === today);
+        
+        const todayData = {
+            date: today,
+            checklist: AppState.checklist,
+            reflections: AppState.reflections,
+            pomodoros: AppState.timer.stats.pomodoros,
+            focusTime: AppState.timer.stats.focusTime
+        };
+        
+        if (existingIndex >= 0) {
+            AppState.history[existingIndex] = todayData;
+        } else {
+            AppState.history.push(todayData);
+        }
+        
+        // Keep only last 365 days
+        if (AppState.history.length > 365) {
+            AppState.history = AppState.history.slice(-365);
+        }
+        
         const data = {
             checklist: AppState.checklist,
             reflections: AppState.reflections,
@@ -1168,20 +1594,26 @@ function saveToLocalStorage() {
             },
             pairwise: {
                 options: AppState.pairwise.options,
-                scores: AppState.pairwise.scores
+                scores: AppState.pairwise.scores,
+                lastResults: AppState.pairwise.lastResults
             },
             kanban: {
                 tasks: AppState.kanban.tasks,
                 taskIdCounter: AppState.kanban.taskIdCounter
             },
             gsheet: AppState.gsheet,
+            sync: {
+                enabled: AppState.sync.enabled,
+                interval: AppState.sync.interval,
+                lastSync: AppState.sync.lastSync
+            },
+            history: AppState.history,
             lastSaved: new Date().toISOString()
         };
         
         localStorage.setItem('sync-planner-data', JSON.stringify(data));
     } catch (error) {
         console.error('Failed to save to localStorage:', error);
-        // Handle quota exceeded
         if (error.name === 'QuotaExceededError') {
             alert('Storage penuh! Hapus beberapa data atau export backup.');
         }
@@ -1195,13 +1627,11 @@ function loadFromLocalStorage() {
         
         const data = JSON.parse(saved);
         
-        // Check if data is from today (for checklist reset)
         const lastSaved = new Date(data.lastSaved);
         const today = new Date();
         const isNewDay = lastSaved.toDateString() !== today.toDateString();
         
         if (isNewDay) {
-            // Reset daily data
             AppState.checklist = [];
             AppState.reflections = { good: '', improve: '', gratitude: '', sedona: '' };
             AppState.timer.stats = { pomodoros: 0, focusTime: 0, breaks: 0, streak: 0 };
@@ -1213,16 +1643,21 @@ function loadFromLocalStorage() {
             if (data.timer?.currentSession) AppState.timer.currentSession = data.timer.currentSession;
         }
         
-        // Load persistent data
         if (data.timer?.settings) AppState.timer.settings = data.timer.settings;
         if (data.timer?.sound) AppState.timer.sound = data.timer.sound;
         if (data.pairwise?.options) AppState.pairwise.options = data.pairwise.options;
         if (data.pairwise?.scores) AppState.pairwise.scores = data.pairwise.scores;
+        if (data.pairwise?.lastResults) AppState.pairwise.lastResults = data.pairwise.lastResults;
         if (data.kanban?.tasks) AppState.kanban.tasks = data.kanban.tasks;
         if (data.kanban?.taskIdCounter) AppState.kanban.taskIdCounter = data.kanban.taskIdCounter;
         if (data.gsheet) AppState.gsheet = data.gsheet;
+        if (data.sync) {
+            AppState.sync.enabled = data.sync.enabled;
+            AppState.sync.interval = data.sync.interval;
+            AppState.sync.lastSync = data.sync.lastSync;
+        }
+        if (data.history) AppState.history = data.history;
         
-        // Update UI
         loadChecklistState();
         loadReflections();
         loadTimerSettings();
@@ -1238,24 +1673,20 @@ function loadFromLocalStorage() {
 let deferredPrompt;
 
 function initPWA() {
-    // Request notification permission
     if ('Notification' in window && Notification.permission === 'default') {
         Notification.requestPermission();
     }
     
-    // Register service worker
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
             .then(reg => console.log('Service Worker registered'))
             .catch(err => console.log('Service Worker registration failed:', err));
     }
     
-    // Listen for install prompt
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
         
-        // Show install banner if not dismissed recently
         const dismissed = localStorage.getItem('pwa-banner-dismissed');
         const dismissedTime = dismissed ? parseInt(dismissed) : 0;
         const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
@@ -1291,21 +1722,19 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Close modal on outside click
 document.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal-overlay')) {
         closeTaskModal();
+        closePairwiseKanbanModal();
     }
 });
 
-// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
-    // ESC to close modal
     if (e.key === 'Escape') {
         closeTaskModal();
+        closePairwiseKanbanModal();
     }
     
-    // Ctrl/Cmd + S to save
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         saveToLocalStorage();

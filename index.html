@@ -31,6 +31,12 @@
         <span class="theme-icon">🌙</span>
     </button>
 
+    <!-- Sync Status Indicator -->
+    <div class="sync-indicator" id="sync-indicator">
+        <span class="sync-icon">🔄</span>
+        <span class="sync-text">Syncing...</span>
+    </div>
+
     <!-- PWA Install Banner -->
     <div class="pwa-install-banner" id="pwa-install-banner">
         <div class="pwa-install-info">
@@ -78,6 +84,10 @@
             <button class="nav-tab" data-tab="kanban" onclick="switchTab('kanban')">
                 <span class="nav-icon">📋</span>
                 <span class="nav-text">Kanban</span>
+            </button>
+            <button class="nav-tab" data-tab="progress" onclick="switchTab('progress')">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Progres</span>
             </button>
             <button class="nav-tab" data-tab="settings" onclick="switchTab('settings')">
                 <span class="nav-icon">⚙️</span>
@@ -158,11 +168,11 @@
                         </div>
                         <div class="checklist-item" onclick="toggleCheck(this)" data-index="5">
                             <div class="checkbox">✓</div>
-                            <span class="check-text">Sholat Dzuhur tepat waktu</span>
+                            <span class="check-text">Sholat Dzuhur</span>
                         </div>
                         <div class="checklist-item" onclick="toggleCheck(this)" data-index="6">
                             <div class="checkbox">✓</div>
-                            <span class="check-text">Sholat Ashar tepat waktu</span>
+                            <span class="check-text">Sholat Ashar</span>
                         </div>
                         <div class="checklist-item" onclick="toggleCheck(this)" data-index="7">
                             <div class="checkbox">✓</div>
@@ -170,191 +180,46 @@
                         </div>
                         <div class="checklist-item" onclick="toggleCheck(this)" data-index="8">
                             <div class="checkbox">✓</div>
-                            <span class="check-text">Evaluasi hari (Sedona Method)</span>
+                            <span class="check-text">Sholat Maghrib</span>
+                        </div>
+                        <div class="checklist-item" onclick="toggleCheck(this)" data-index="9">
+                            <div class="checkbox">✓</div>
+                            <span class="check-text">Sholat Isya</span>
                         </div>
                     </div>
                     
-                    <div class="progress-container">
-                        <div class="progress-header">
-                            <span>Progress Hari Ini</span>
-                            <span id="progress-text">0%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
-                        </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-label">
+                        <span>Progres Hari Ini</span>
+                        <span id="progress-text">0%</span>
                     </div>
                 </div>
 
-                <!-- Work Block -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-icon icon-work">💼</div>
-                        <h2 class="card-title">Blok Kerja</h2>
-                    </div>
-                    
-                    <div class="time-block">
-                        <span class="time-label">07:30</span>
-                        <div class="time-content">
-                            <div class="time-title">Persiapan Kerja</div>
-                            <div class="time-desc">Review agenda, prioritas MIT</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block highlight">
-                        <span class="time-label">08:00</span>
-                        <div class="time-content">
-                            <div class="time-title">Deep Work Session 1</div>
-                            <div class="time-desc">Tugas prioritas tinggi (2 jam)</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block">
-                        <span class="time-label">10:00</span>
-                        <div class="time-content">
-                            <div class="time-title">Istirahat & Email</div>
-                            <div class="time-desc">Check email, komunikasi ringan</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block highlight">
-                        <span class="time-label">10:30</span>
-                        <div class="time-content">
-                            <div class="time-title">Deep Work Session 2</div>
-                            <div class="time-desc">Meeting & kolaborasi</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block prayer">
-                        <span class="time-label">12:00</span>
-                        <div class="time-content">
-                            <div class="time-title">🕌 Sholat Dzuhur</div>
-                            <div class="time-desc">Tepat waktu + dzikir</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block">
-                        <span class="time-label">12:30</span>
-                        <div class="time-content">
-                            <div class="time-title">Istirahat Makan Siang</div>
-                            <div class="time-desc">Makan, qailulah (tidur siang)</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block highlight">
-                        <span class="time-label">13:30</span>
-                        <div class="time-content">
-                            <div class="time-title">Deep Work Session 3</div>
-                            <div class="time-desc">Administrative tasks</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block prayer">
-                        <span class="time-label">15:00</span>
-                        <div class="time-content">
-                            <div class="time-title">🕌 Sholat Ashar</div>
-                            <div class="time-desc">Tepat waktu + dzikir</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block highlight">
-                        <span class="time-label">15:30</span>
-                        <div class="time-content">
-                            <div class="time-title">Deep Work Session 4</div>
-                            <div class="time-desc">Review & planning besok</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Evening Routine -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-icon icon-evening">🌅</div>
-                        <h2 class="card-title">Rutinitas Sore & Malam</h2>
-                    </div>
-                    
-                    <div class="time-block">
-                        <span class="time-label">17:00</span>
-                        <div class="time-content">
-                            <div class="time-title">Selesai Kerja</div>
-                            <div class="time-desc">Shutdown ritual, rapikan meja</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block prayer">
-                        <span class="time-label">18:00</span>
-                        <div class="time-content">
-                            <div class="time-title">🕌 Sholat Maghrib</div>
-                            <div class="time-desc">Berjamaah + dzikir petang</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block">
-                        <span class="time-label">18:30</span>
-                        <div class="time-content">
-                            <div class="time-title">Quality Time Keluarga</div>
-                            <div class="time-desc">Makan bersama, ngobrol</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block prayer">
-                        <span class="time-label">19:15</span>
-                        <div class="time-content">
-                            <div class="time-title">🕌 Sholat Isya</div>
-                            <div class="time-desc">Berjamaah + wirid</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block">
-                        <span class="time-label">20:00</span>
-                        <div class="time-content">
-                            <div class="time-title">Personal Development</div>
-                            <div class="time-desc">Baca buku, online course</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block">
-                        <span class="time-label">21:30</span>
-                        <div class="time-content">
-                            <div class="time-title">Wind Down</div>
-                            <div class="time-desc">Sedona Method, journaling malam</div>
-                        </div>
-                    </div>
-                    
-                    <div class="time-block">
-                        <span class="time-label">22:00</span>
-                        <div class="time-content">
-                            <div class="time-title">Tidur</div>
-                            <div class="time-desc">Doa tidur, target 5-6 jam</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reflection Section -->
+                <!-- Reflections -->
                 <div class="card card-full">
                     <div class="card-header">
-                        <div class="card-icon icon-reflection">✨</div>
-                        <h2 class="card-title">Refleksi Harian</h2>
+                        <div class="card-icon icon-reflection">📝</div>
+                        <h2 class="card-title">Refleksi & Catatan</h2>
                     </div>
                     
                     <div class="reflection-grid">
-                        <div class="reflection-group">
-                            <label class="reflection-label">🌟 3 Hal Baik Hari Ini</label>
-                            <textarea class="reflection-textarea" id="reflection-good" placeholder="Apa saja yang berjalan baik hari ini?" oninput="saveReflections()"></textarea>
+                        <div class="reflection-item">
+                            <label class="reflection-label">🎯 Apa yang berjalan baik hari ini?</label>
+                            <textarea class="reflection-input" id="reflection-good" placeholder="Tuliskan pencapaian positif..." onchange="saveReflections()"></textarea>
                         </div>
-                        
-                        <div class="reflection-group">
-                            <label class="reflection-label">🔧 Yang Bisa Diperbaiki</label>
-                            <textarea class="reflection-textarea" id="reflection-improve" placeholder="Apa yang bisa lebih baik?" oninput="saveReflections()"></textarea>
+                        <div class="reflection-item">
+                            <label class="reflection-label">⚡ Apa yang bisa diperbaiki?</label>
+                            <textarea class="reflection-input" id="reflection-improve" placeholder="Area untuk perbaikan..." onchange="saveReflections()"></textarea>
                         </div>
-                        
-                        <div class="reflection-group">
-                            <label class="reflection-label">🤲 Syukur Hari Ini</label>
-                            <textarea class="reflection-textarea" id="reflection-gratitude" placeholder="Nikmat apa yang disyukuri?" oninput="saveReflections()"></textarea>
+                        <div class="reflection-item">
+                            <label class="reflection-label">🙏 Syukur (Gratitude)</label>
+                            <textarea class="reflection-input" id="reflection-gratitude" placeholder="3 hal yang disyukuri hari ini..." onchange="saveReflections()"></textarea>
                         </div>
-                        
-                        <div class="reflection-group">
-                            <label class="reflection-label">🧘 Sedona Method Release</label>
-                            <textarea class="reflection-textarea" id="reflection-sedona" placeholder="Emosi apa yang dilepaskan? (Could I let it go? Would I? When?)" oninput="saveReflections()"></textarea>
+                        <div class="reflection-item">
+                            <label class="reflection-label">💭 Sedona Method: Lepaskan</label>
+                            <textarea class="reflection-input" id="reflection-sedona" placeholder="Apa yang bisa dilepaskan?" onchange="saveReflections()"></textarea>
                         </div>
                     </div>
                 </div>
@@ -363,297 +228,147 @@
 
         <!-- ==================== POMODORO TAB ==================== -->
         <div id="pomodoro-tab" class="tab-content">
-            <div class="pomodoro-grid">
+            <div class="planner-grid">
                 <!-- Timer Card -->
-                <div class="card pomodoro-main">
+                <div class="card">
                     <div class="card-header">
                         <div class="card-icon icon-pomodoro">🍅</div>
                         <h2 class="card-title">Pomodoro Timer</h2>
                     </div>
-
-                    <!-- Mode Selector -->
-                    <div class="mode-selector">
-                        <button class="mode-btn active work" data-mode="work" onclick="setTimerMode('work')">
+                    
+                    <div class="timer-modes">
+                        <button class="mode-btn active" data-mode="work" onclick="setTimerMode('work')">
                             🎯 Deep Work
                         </button>
-                        <button class="mode-btn short-break" data-mode="short-break" onclick="setTimerMode('short-break')">
+                        <button class="mode-btn" data-mode="short-break" onclick="setTimerMode('short-break')">
                             ☕ Istirahat
                         </button>
-                        <button class="mode-btn long-break" data-mode="long-break" onclick="setTimerMode('long-break')">
-                            🌴 Istirahat Panjang
+                        <button class="mode-btn" data-mode="long-break" onclick="setTimerMode('long-break')">
+                            🧘 Panjang
                         </button>
-                    </div>
-
-                    <!-- Timer Ring Display -->
-                    <div class="timer-ring">
-                        <svg width="280" height="280" viewBox="0 0 280 280">
-                            <circle class="timer-ring-bg" cx="140" cy="140" r="130"></circle>
-                            <circle class="timer-ring-progress work" id="timer-progress" cx="140" cy="140" r="130" 
-                                stroke-dasharray="816.81" stroke-dashoffset="0"></circle>
-                        </svg>
-                        <div class="timer-ring-content">
-                            <div class="timer-time" id="timer-display">25:00</div>
-                            <div class="timer-label" id="timer-mode-label">Deep Work</div>
-                        </div>
-                    </div>
-
-                    <!-- Timer Controls -->
-                    <div class="timer-controls">
-                        <button class="timer-btn timer-btn-start" id="btn-timer-start" onclick="startTimer()">
-                            <span>▶</span> Mulai
-                        </button>
-                        <button class="timer-btn timer-btn-pause" id="btn-timer-pause" onclick="pauseTimer()" style="display: none;">
-                            <span>⏸</span> Pause
-                        </button>
-                        <button class="timer-btn timer-btn-reset" onclick="resetTimer()">
-                            <span>↺</span> Reset
-                        </button>
-                        <button class="timer-btn timer-btn-skip" onclick="skipTimer()">
-                            <span>⏭</span> Skip
-                        </button>
-                    </div>
-
-                    <!-- Current Task Display -->
-                    <div class="current-task-display" id="current-task-display" style="display: none;">
-                        <h4>📌 Sedang Dikerjakan:</h4>
-                        <p id="current-task-name">-</p>
-                    </div>
-
-                    <!-- Session Info -->
-                    <div class="timer-session" id="session-info">
-                        Sesi 1 dari 4 🍅
-                    </div>
-
-                    <!-- Stats -->
-                    <div class="pomodoro-stats">
-                        <div class="stat-box">
-                            <div class="stat-box-value" id="stat-pomodoros">0</div>
-                            <div class="stat-box-label">Pomodoro</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-box-value" id="stat-focus-time">0m</div>
-                            <div class="stat-box-label">Fokus</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-box-value" id="stat-breaks">0</div>
-                            <div class="stat-box-label">Istirahat</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-box-value" id="stat-streak">0</div>
-                            <div class="stat-box-label">Streak 🔥</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Deep Work Sessions Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-icon icon-work">💼</div>
-                        <h2 class="card-title">Deep Work Sessions</h2>
                     </div>
                     
-                    <div class="deep-work-sessions" id="deep-work-sessions">
-                        <div class="session-card" data-session="1">
-                            <div class="session-info">
-                                <div class="session-number">1</div>
-                                <div class="session-details">
-                                    <h4>Deep Work Session 1</h4>
-                                    <p>08:00 - 10:00 | Prioritas Tinggi</p>
-                                </div>
-                            </div>
-                            <div class="session-action">
-                                <span class="session-status status-pending" id="session-status-1">Menunggu</span>
-                                <button class="start-session-btn" onclick="startDeepWorkSession(1)">Mulai</button>
-                            </div>
+                    <div class="timer-container">
+                        <svg class="timer-ring" viewBox="0 0 280 280">
+                            <circle class="timer-ring-bg" cx="140" cy="140" r="130"></circle>
+                            <circle class="timer-ring-progress work" id="timer-progress" cx="140" cy="140" r="130"></circle>
+                        </svg>
+                        <div class="timer-display">
+                            <span class="timer-time" id="timer-display">25:00</span>
+                            <span class="timer-mode" id="timer-mode-label">Deep Work</span>
                         </div>
-                        
-                        <div class="session-card" data-session="2">
-                            <div class="session-info">
-                                <div class="session-number">2</div>
-                                <div class="session-details">
-                                    <h4>Deep Work Session 2</h4>
-                                    <p>10:30 - 12:00 | Meeting</p>
-                                </div>
-                            </div>
-                            <div class="session-action">
-                                <span class="session-status status-pending" id="session-status-2">Menunggu</span>
-                                <button class="start-session-btn" onclick="startDeepWorkSession(2)">Mulai</button>
-                            </div>
-                        </div>
-                        
-                        <div class="session-card" data-session="3">
-                            <div class="session-info">
-                                <div class="session-number">3</div>
-                                <div class="session-details">
-                                    <h4>Deep Work Session 3</h4>
-                                    <p>13:30 - 15:00 | Admin</p>
-                                </div>
-                            </div>
-                            <div class="session-action">
-                                <span class="session-status status-pending" id="session-status-3">Menunggu</span>
-                                <button class="start-session-btn" onclick="startDeepWorkSession(3)">Mulai</button>
-                            </div>
-                        </div>
+                    </div>
+                    
+                    <div class="timer-controls">
+                        <button class="timer-btn" id="btn-timer-start" onclick="startTimer()">▶️ Mulai</button>
+                        <button class="timer-btn" id="btn-timer-pause" onclick="pauseTimer()" style="display: none;">⏸️ Pause</button>
+                        <button class="timer-btn secondary" onclick="resetTimer()">🔄 Reset</button>
+                        <button class="timer-btn secondary" onclick="skipTimer()">⏭️ Skip</button>
+                    </div>
+                    
+                    <p class="session-info" id="session-info">Sesi 1 dari 4 🍅</p>
+                </div>
 
-                        <div class="session-card" data-session="4">
-                            <div class="session-info">
-                                <div class="session-number">4</div>
-                                <div class="session-details">
-                                    <h4>Deep Work Session 4</h4>
-                                    <p>15:30 - 17:00 | Review</p>
-                                </div>
-                            </div>
-                            <div class="session-action">
-                                <span class="session-status status-pending" id="session-status-4">Menunggu</span>
-                                <button class="start-session-btn" onclick="startDeepWorkSession(4)">Mulai</button>
-                            </div>
+                <!-- Timer Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-guide">📊</div>
+                        <h2 class="card-title">Statistik Hari Ini</h2>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value" id="stat-pomodoros">0</span>
+                            <span class="stat-label">Pomodoro</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="stat-focus-time">0m</span>
+                            <span class="stat-label">Fokus</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="stat-breaks">0</span>
+                            <span class="stat-label">Istirahat</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="stat-streak">0</span>
+                            <span class="stat-label">Streak</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Settings Card -->
-                <div class="card">
+                <!-- Timer Settings -->
+                <div class="card card-full">
                     <div class="card-header">
                         <div class="card-icon icon-settings">⚙️</div>
                         <h2 class="card-title">Pengaturan Timer</h2>
                     </div>
                     
-                    <div class="pomodoro-settings">
-                        <div class="settings-grid">
-                            <div class="setting-item">
-                                <label>🎯 Deep Work</label>
-                                <input type="number" id="setting-work" value="25" min="1" max="90" onchange="updateTimerSettings()">
-                                <span>menit</span>
-                            </div>
-                            <div class="setting-item">
-                                <label>☕ Istirahat</label>
-                                <input type="number" id="setting-short-break" value="5" min="1" max="30" onchange="updateTimerSettings()">
-                                <span>menit</span>
-                            </div>
-                            <div class="setting-item">
-                                <label>🌴 Istirahat Panjang</label>
-                                <input type="number" id="setting-long-break" value="15" min="1" max="60" onchange="updateTimerSettings()">
-                                <span>menit</span>
-                            </div>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label>🎯 Deep Work (menit)</label>
+                            <input type="number" id="setting-work" value="25" min="1" max="120" onchange="updateTimerSettings()">
                         </div>
-
-                        <div class="sound-settings">
-                            <div class="sound-setting-row">
-                                <label>
-                                    <input type="checkbox" id="sound-enabled" checked onchange="updateSoundSettings()">
-                                    🔔 Notifikasi Suara
-                                </label>
-                                <input type="range" class="volume-slider" id="sound-volume" min="0" max="100" value="50" onchange="updateSoundSettings()">
-                                <button class="test-sound-btn" onclick="testSound()">Test</button>
-                            </div>
+                        <div class="setting-item">
+                            <label>☕ Istirahat Pendek (menit)</label>
+                            <input type="number" id="setting-short-break" value="5" min="1" max="30" onchange="updateTimerSettings()">
                         </div>
+                        <div class="setting-item">
+                            <label>🧘 Istirahat Panjang (menit)</label>
+                            <input type="number" id="setting-long-break" value="15" min="1" max="60" onchange="updateTimerSettings()">
+                        </div>
+                    </div>
+                    
+                    <div class="sound-settings">
+                        <h4>🔊 Pengaturan Suara</h4>
+                        <div class="sound-toggle">
+                            <label>
+                                <input type="checkbox" id="sound-enabled" checked onchange="updateSoundSettings()">
+                                Aktifkan notifikasi suara
+                            </label>
+                        </div>
+                        <div class="sound-volume">
+                            <label>Volume</label>
+                            <input type="range" id="sound-volume" min="0" max="100" value="50" onchange="updateSoundSettings()">
+                        </div>
+                        <button class="btn-secondary" onclick="testSound()">🔔 Test Suara</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ==================== PAIRWISE COMPARISON TAB ==================== -->
+        <!-- ==================== PAIRWISE TAB ==================== -->
         <div id="pairwise-tab" class="tab-content">
-            <div class="pairwise-container">
-                <!-- Guide Card -->
-                <div class="card pairwise-guide">
-                    <div class="card-header">
-                        <div class="card-icon icon-guide">📖</div>
-                        <h2 class="card-title">Panduan Pairwise</h2>
-                    </div>
-                    
-                    <div class="guide-content">
-                        <div class="guide-section">
-                            <h4>🎯 Apa itu Pairwise Comparison?</h4>
-                            <p>Metode ilmiah untuk menentukan prioritas dengan membandingkan setiap opsi secara berpasangan. Lebih akurat daripada ranking langsung!</p>
-                        </div>
-                        
-                        <div class="guide-section">
-                            <h4>📝 Cara Penggunaan:</h4>
-                            <ol class="guide-steps">
-                                <li>Masukkan opsi/tugas yang ingin diprioritaskan</li>
-                                <li>Minimal 3 opsi, maksimal 10 opsi</li>
-                                <li>Klik "Mulai Perbandingan"</li>
-                                <li>Pilih yang LEBIH PENTING di setiap pasangan</li>
-                                <li>Lihat hasil ranking otomatis</li>
-                            </ol>
-                        </div>
-                        
-                        <div class="guide-section">
-                            <h4>💡 Tips Memilih:</h4>
-                            <div class="tips-grid">
-                                <div class="tip-item">
-                                    <span class="tip-icon">⏰</span>
-                                    <div>
-                                        <strong>Urgensi</strong>
-                                        <p>Mana deadline lebih dekat?</p>
-                                    </div>
-                                </div>
-                                <div class="tip-item">
-                                    <span class="tip-icon">📈</span>
-                                    <div>
-                                        <strong>Dampak</strong>
-                                        <p>Mana hasil lebih besar?</p>
-                                    </div>
-                                </div>
-                                <div class="tip-item">
-                                    <span class="tip-icon">🎯</span>
-                                    <div>
-                                        <strong>Tujuan</strong>
-                                        <p>Mana lebih selaras goal?</p>
-                                    </div>
-                                </div>
-                                <div class="tip-item">
-                                    <span class="tip-icon">⚡</span>
-                                    <div>
-                                        <strong>Energi</strong>
-                                        <p>Mana butuh fokus lebih?</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="islamic-reminder">
-                            <h4>🤲 Pengingat Islami</h4>
-                            <p class="arabic-text">يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَلْتَنظُرْ نَفْسٌ مَّا قَدَّمَتْ لِغَدٍ</p>
-                            <em>"Hai orang-orang yang beriman, bertakwalah kepada Allah dan hendaklah setiap diri memperhatikan apa yang telah diperbuatnya untuk hari esok"</em>
-                            <p>— QS. Al-Hasyr: 18</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Input Card -->
+            <div class="planner-grid">
+                <!-- Input Options -->
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-icon icon-input">✏️</div>
-                        <h2 class="card-title">Masukkan Opsi</h2>
+                        <div class="card-icon icon-input">📝</div>
+                        <h2 class="card-title">Input Opsi</h2>
                     </div>
                     
-                    <div class="options-input-area">
-                        <div class="input-row">
-                            <input type="text" class="option-input" id="option-input" placeholder="Ketik tugas/opsi..." maxlength="100" onkeypress="handleOptionKeypress(event)">
-                            <button class="btn-add-option" onclick="addOption()">+ Tambah</button>
+                    <p class="card-desc">Masukkan opsi yang ingin dibandingkan (3-10 item)</p>
+                    
+                    <div class="input-group">
+                        <input type="text" class="option-input" id="option-input" placeholder="Ketik opsi..." onkeypress="handleOptionKeypress(event)">
+                        <button class="btn-primary" onclick="addOption()">➕ Tambah</button>
+                    </div>
+                    
+                    <div class="options-list" id="options-list">
+                        <div class="empty-state">
+                            <span>📝</span>
+                            <p>Belum ada opsi. Tambahkan minimal 3 opsi.</p>
                         </div>
-                        
-                        <div class="options-list" id="options-list">
-                            <div class="empty-state">
-                                <span>📝</span>
-                                <p>Belum ada opsi. Tambahkan minimal 3 opsi.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="options-actions">
-                            <span class="options-count" id="options-count">0 opsi</span>
-                            <div class="action-buttons">
-                                <button class="btn-secondary" onclick="clearAllOptions()">🗑️ Hapus Semua</button>
-                                <button class="btn-primary" onclick="startComparison()" id="btn-start-comparison" disabled>⚖️ Mulai Perbandingan</button>
-                            </div>
-                        </div>
+                    </div>
+                    
+                    <div class="options-actions">
+                        <span class="options-count" id="options-count">0 opsi</span>
+                        <button class="btn-secondary" onclick="clearAllOptions()">🗑️ Hapus Semua</button>
+                        <button class="btn-primary" id="btn-start-comparison" onclick="startComparison()" disabled>▶️ Mulai Perbandingan</button>
                     </div>
                 </div>
 
                 <!-- Comparison Card -->
-                <div class="card comparison-card" id="comparison-card" style="display: none;">
+                <div class="card" id="comparison-card" style="display: none;">
                     <div class="card-header">
                         <div class="card-icon icon-compare">⚖️</div>
                         <h2 class="card-title">Pilih yang Lebih Penting</h2>
@@ -667,22 +382,18 @@
                     </div>
                     
                     <div class="comparison-options">
-                        <button class="comparison-option" id="comparison-option-a" onclick="selectOption('a')">
-                            <span class="option-label">A</span>
-                            <span class="option-text" id="option-text-a">Option A</span>
+                        <button class="comparison-btn" onclick="selectOption('a')">
+                            <span class="comparison-text" id="option-text-a">Opsi A</span>
                         </button>
-                        
                         <div class="comparison-vs">VS</div>
-                        
-                        <button class="comparison-option" id="comparison-option-b" onclick="selectOption('b')">
-                            <span class="option-label">B</span>
-                            <span class="option-text" id="option-text-b">Option B</span>
+                        <button class="comparison-btn" onclick="selectOption('b')">
+                            <span class="comparison-text" id="option-text-b">Opsi B</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Results Card -->
-                <div class="card results-card" id="results-card" style="display: none;">
+                <div class="card" id="results-card" style="display: none;">
                     <div class="card-header">
                         <div class="card-icon icon-results">🏆</div>
                         <h2 class="card-title">Hasil Prioritas</h2>
@@ -692,7 +403,46 @@
                     
                     <div class="results-actions">
                         <button class="btn-secondary" onclick="resetComparison()">🔄 Ulang</button>
-                        <button class="btn-primary" onclick="syncPairwiseToSheet()">💾 Simpan ke GSheet</button>
+                        <button class="btn-primary" onclick="addResultsToKanban()">📋 Tambah ke Kanban</button>
+                    </div>
+                </div>
+
+                <!-- Guide -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-guide">💡</div>
+                        <h2 class="card-title">Cara Kerja</h2>
+                    </div>
+                    
+                    <div class="guide-steps">
+                        <div class="guide-step">
+                            <span class="step-number">1</span>
+                            <div class="step-content">
+                                <strong>Tambahkan Opsi</strong>
+                                <p>Minimal 3 opsi untuk dibandingkan</p>
+                            </div>
+                        </div>
+                        <div class="guide-step">
+                            <span class="step-number">2</span>
+                            <div class="step-content">
+                                <strong>Bandingkan</strong>
+                                <p>Pilih mana yang lebih penting</p>
+                            </div>
+                        </div>
+                        <div class="guide-step">
+                            <span class="step-number">3</span>
+                            <div class="step-content">
+                                <strong>Lihat Hasil</strong>
+                                <p>Dapatkan urutan prioritas</p>
+                            </div>
+                        </div>
+                        <div class="guide-step">
+                            <span class="step-number">4</span>
+                            <div class="step-content">
+                                <strong>Tambah ke Kanban</strong>
+                                <p>Kirim hasil langsung ke Kanban Board</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -700,182 +450,327 @@
 
         <!-- ==================== KANBAN TAB ==================== -->
         <div id="kanban-tab" class="tab-content">
-            <!-- Quick Add Task -->
-            <div class="kanban-header">
-                <div class="kanban-add">
-                    <input type="text" class="kanban-input" id="quick-task-input" placeholder="Tambah tugas baru..." maxlength="200" onkeypress="handleQuickTaskKeypress(event)">
-                    <select class="priority-select" id="quick-task-priority">
-                        <option value="medium">🟡 Sedang</option>
-                        <option value="high">🔴 Tinggi</option>
-                        <option value="low">🟢 Rendah</option>
-                    </select>
-                    <button class="btn-add-task" onclick="quickAddTask()">+ Tambah</button>
+            <!-- Quick Add -->
+            <div class="kanban-quick-add">
+                <input type="text" class="quick-task-input" id="quick-task-input" placeholder="Tambah tugas baru..." onkeypress="handleQuickTaskKeypress(event)">
+                <select class="quick-task-priority" id="quick-task-priority">
+                    <option value="high">🔴 Tinggi</option>
+                    <option value="medium" selected>🟡 Sedang</option>
+                    <option value="low">🟢 Rendah</option>
+                </select>
+                <button class="btn-primary" onclick="quickAddTask()">➕ Tambah</button>
+            </div>
+
+            <!-- Kanban Stats -->
+            <div class="kanban-stats">
+                <div class="kanban-stat">
+                    <span class="kanban-stat-value" id="stat-total">0</span>
+                    <span class="kanban-stat-label">Total</span>
                 </div>
-                
-                <div class="stats-bar">
-                    <div class="stat-item">
-                        <div class="stat-number" id="stat-total">0</div>
-                        <div class="stat-label">Total</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="stat-progress">0</div>
-                        <div class="stat-label">Progress</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="stat-done">0</div>
-                        <div class="stat-label">Selesai</div>
-                    </div>
+                <div class="kanban-stat">
+                    <span class="kanban-stat-value" id="stat-progress">0</span>
+                    <span class="kanban-stat-label">In Progress</span>
+                </div>
+                <div class="kanban-stat">
+                    <span class="kanban-stat-value" id="stat-done">0</span>
+                    <span class="kanban-stat-label">Selesai</span>
                 </div>
             </div>
 
             <!-- Kanban Board -->
             <div class="kanban-board">
-                <div class="kanban-column" data-column="backlog">
+                <!-- Backlog Column -->
+                <div class="kanban-column">
                     <div class="column-header">
                         <h3>📥 Backlog</h3>
                         <span class="column-count" id="count-backlog">0</span>
                     </div>
-                    <div class="column-tasks" id="column-backlog" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'backlog')"></div>
+                    <div class="column-content" id="column-backlog" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'backlog')"></div>
                 </div>
-                
-                <div class="kanban-column" data-column="todo">
+
+                <!-- To Do Column -->
+                <div class="kanban-column">
                     <div class="column-header">
                         <h3>📋 To Do</h3>
                         <span class="column-count" id="count-todo">0</span>
                     </div>
-                    <div class="column-tasks" id="column-todo" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'todo')"></div>
+                    <div class="column-content" id="column-todo" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'todo')"></div>
                 </div>
-                
-                <div class="kanban-column" data-column="inprogress">
+
+                <!-- In Progress Column -->
+                <div class="kanban-column">
                     <div class="column-header">
                         <h3>🔄 In Progress</h3>
                         <span class="column-count" id="count-inprogress">0</span>
                     </div>
-                    <div class="column-tasks" id="column-inprogress" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'inprogress')"></div>
+                    <div class="column-content" id="column-inprogress" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'inprogress')"></div>
                 </div>
-                
-                <div class="kanban-column" data-column="done">
+
+                <!-- Done Column -->
+                <div class="kanban-column">
                     <div class="column-header">
                         <h3>✅ Done</h3>
                         <span class="column-count" id="count-done">0</span>
                     </div>
-                    <div class="column-tasks" id="column-done" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'done')"></div>
+                    <div class="column-content" id="column-done" ondragover="handleDragOver(event)" ondrop="handleDrop(event, 'done')"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PROGRESS TAB ==================== -->
+        <div id="progress-tab" class="tab-content">
+            <div class="planner-grid">
+                <!-- Period Selector -->
+                <div class="card card-full">
+                    <div class="card-header">
+                        <div class="card-icon icon-guide">📊</div>
+                        <h2 class="card-title">Rekap Progres</h2>
+                    </div>
+                    
+                    <div class="period-selector">
+                        <button class="period-btn active" data-period="week" onclick="showProgress('week')">📅 1 Minggu</button>
+                        <button class="period-btn" data-period="month" onclick="showProgress('month')">📆 1 Bulan</button>
+                        <button class="period-btn" data-period="quarter" onclick="showProgress('quarter')">📊 3 Bulan</button>
+                        <button class="period-btn" data-period="year" onclick="showProgress('year')">📈 1 Tahun</button>
+                    </div>
+                </div>
+
+                <!-- Summary Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-pomodoro">🎯</div>
+                        <h2 class="card-title">Ringkasan</h2>
+                    </div>
+                    
+                    <div class="progress-summary" id="progress-summary">
+                        <div class="summary-item">
+                            <span class="summary-value" id="summary-tasks-completed">0</span>
+                            <span class="summary-label">Tugas Selesai</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value" id="summary-pomodoros">0</span>
+                            <span class="summary-label">Total Pomodoro</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value" id="summary-focus-hours">0h</span>
+                            <span class="summary-label">Waktu Fokus</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value" id="summary-checklist-avg">0%</span>
+                            <span class="summary-label">Rata-rata Checklist</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ibadah Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-tahajud">🕌</div>
+                        <h2 class="card-title">Statistik Ibadah</h2>
+                    </div>
+                    
+                    <div class="ibadah-stats" id="ibadah-stats">
+                        <div class="ibadah-item">
+                            <span class="ibadah-icon">🌙</span>
+                            <div class="ibadah-info">
+                                <span class="ibadah-name">Tahajud</span>
+                                <div class="ibadah-bar">
+                                    <div class="ibadah-fill" id="ibadah-tahajud" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <span class="ibadah-percent" id="ibadah-tahajud-pct">0%</span>
+                        </div>
+                        <div class="ibadah-item">
+                            <span class="ibadah-icon">☀️</span>
+                            <div class="ibadah-info">
+                                <span class="ibadah-name">Subuh Berjamaah</span>
+                                <div class="ibadah-bar">
+                                    <div class="ibadah-fill" id="ibadah-subuh" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <span class="ibadah-percent" id="ibadah-subuh-pct">0%</span>
+                        </div>
+                        <div class="ibadah-item">
+                            <span class="ibadah-icon">📿</span>
+                            <div class="ibadah-info">
+                                <span class="ibadah-name">Dzikir Pagi</span>
+                                <div class="ibadah-bar">
+                                    <div class="ibadah-fill" id="ibadah-dzikir-pagi" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <span class="ibadah-percent" id="ibadah-dzikir-pagi-pct">0%</span>
+                        </div>
+                        <div class="ibadah-item">
+                            <span class="ibadah-icon">🌅</span>
+                            <div class="ibadah-info">
+                                <span class="ibadah-name">Dzikir Petang</span>
+                                <div class="ibadah-bar">
+                                    <div class="ibadah-fill" id="ibadah-dzikir-petang" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <span class="ibadah-percent" id="ibadah-dzikir-petang-pct">0%</span>
+                        </div>
+                        <div class="ibadah-item">
+                            <span class="ibadah-icon">🏃</span>
+                            <div class="ibadah-info">
+                                <span class="ibadah-name">Olahraga</span>
+                                <div class="ibadah-bar">
+                                    <div class="ibadah-fill" id="ibadah-olahraga" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <span class="ibadah-percent" id="ibadah-olahraga-pct">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Trend Chart -->
+                <div class="card card-full">
+                    <div class="card-header">
+                        <div class="card-icon icon-morning">📈</div>
+                        <h2 class="card-title">Trend Harian</h2>
+                    </div>
+                    
+                    <div class="trend-chart" id="trend-chart">
+                        <!-- Chart will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- History Log -->
+                <div class="card card-full">
+                    <div class="card-header">
+                        <div class="card-icon icon-log">📜</div>
+                        <h2 class="card-title">Riwayat Harian</h2>
+                    </div>
+                    
+                    <div class="history-list" id="history-list">
+                        <div class="empty-state">
+                            <span>📊</span>
+                            <p>Belum ada data. Mulai gunakan aplikasi untuk melihat riwayat.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- ==================== SETTINGS TAB ==================== -->
         <div id="settings-tab" class="tab-content">
-            <div class="settings-container">
+            <div class="planner-grid">
                 <!-- Google Sheets Setup -->
                 <div class="card card-full">
                     <div class="card-header">
                         <div class="card-icon icon-gsheet">📊</div>
-                        <h2 class="card-title">Google Sheets Integration</h2>
+                        <h2 class="card-title">Google Sheets Sync</h2>
                     </div>
                     
-                    <div class="setup-guide">
-                        <h4>🚀 Cara Setup:</h4>
-                        <div class="setup-steps">
-                            <div class="setup-step">
-                                <div class="step-number">1</div>
-                                <div class="step-content">
-                                    <strong>Buat Google Sheet Baru</strong>
-                                    <p>Buka <a href="https://sheets.google.com" target="_blank">sheets.google.com</a> dan buat spreadsheet baru</p>
-                                </div>
-                            </div>
-                            <div class="setup-step">
-                                <div class="step-number">2</div>
-                                <div class="step-content">
-                                    <strong>Buka Apps Script</strong>
-                                    <p>Klik Extensions → Apps Script</p>
-                                </div>
-                            </div>
-                            <div class="setup-step">
-                                <div class="step-number">3</div>
-                                <div class="step-content">
-                                    <strong>Copy Kode</strong>
-                                    <p>Klik tombol "Lihat Kode Apps Script" di bawah, copy semua kode</p>
-                                </div>
-                            </div>
-                            <div class="setup-step">
-                                <div class="step-number">4</div>
-                                <div class="step-content">
-                                    <strong>Deploy</strong>
-                                    <p>Klik Deploy → New deployment → Web app → Anyone can access</p>
-                                </div>
-                            </div>
-                            <div class="setup-step">
-                                <div class="step-number">5</div>
-                                <div class="step-content">
-                                    <strong>Copy URL</strong>
-                                    <p>Salin Web App URL dan paste di form di bawah</p>
-                                </div>
+                    <div class="setup-steps">
+                        <div class="setup-step">
+                            <span class="step-number">1</span>
+                            <div class="step-content">
+                                <strong>Buat Google Sheet baru</strong>
+                                <p>Buka <a href="https://sheets.google.com" target="_blank">Google Sheets</a> dan buat spreadsheet baru</p>
                             </div>
                         </div>
-                        
-                        <button class="btn-secondary" onclick="toggleAppsScript()" style="margin-top: 15px;">
-                            📜 Lihat Kode Apps Script
-                        </button>
-                        
-                        <div class="apps-script-code" id="apps-script-code" style="display: none;">
-                            <h4>Google Apps Script Code:</h4>
-                            <p class="script-note">Copy semua kode ini ke Apps Script editor:</p>
-                            <button class="btn-primary" onclick="copyAppsScript()" style="margin-bottom: 10px;">📋 Copy Kode</button>
-                            <pre class="script-code">
-// Sync Planner - Google Apps Script
-// Version 2.0
+                        <div class="setup-step">
+                            <span class="step-number">2</span>
+                            <div class="step-content">
+                                <strong>Buka Apps Script</strong>
+                                <p>Klik menu Extensions → Apps Script</p>
+                            </div>
+                        </div>
+                        <div class="setup-step">
+                            <span class="step-number">3</span>
+                            <div class="step-content">
+                                <strong>Paste kode berikut</strong>
+                                <button class="btn-secondary" onclick="toggleAppsScript()">📝 Lihat Kode</button>
+                                <button class="btn-primary" onclick="copyAppsScript()">📋 Copy Kode</button>
+                            </div>
+                        </div>
+                        <div class="setup-step">
+                            <span class="step-number">4</span>
+                            <div class="step-content">
+                                <strong>Deploy sebagai Web App</strong>
+                                <p>Deploy → New deployment → Web app → Execute as: Me, Who: Anyone</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="apps-script-code" id="apps-script-code" style="display: none;">
+                        <h4>Google Apps Script Code:</h4>
+                        <p class="script-note">Copy seluruh kode di bawah ini ke Apps Script editor:</p>
+                        <pre class="script-code" id="apps-script-content">
+// ==================== SYNC PLANNER - GOOGLE APPS SCRIPT ====================
+// Version 3.0 - With Auto Sync & Progress Tracking
 
 function doGet(e) {
-  const type = e.parameter.type || 'tasks';
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  
-  try {
-    if (type === 'tasks') {
-      return getTasksData(ss);
-    } else if (type === 'daily') {
-      const date = e.parameter.date;
-      return getDailyData(ss, date);
-    }
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      success: false,
-      error: error.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
+  return handleRequest(e, 'GET');
 }
 
 function doPost(e) {
+  return handleRequest(e, 'POST');
+}
+
+function handleRequest(e, method) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   
   try {
-    const data = JSON.parse(e.postData.contents);
+    if (method === 'GET') {
+      const type = e.parameter.type || 'tasks';
+      
+      switch(type) {
+        case 'tasks':
+          return getTasksData(ss);
+        case 'daily':
+          return getDailyData(ss, e.parameter.date);
+        case 'progress':
+          return getProgressData(ss, e.parameter.period || 'week');
+        case 'sync':
+          return getSyncData(ss);
+        default:
+          return createResponse({ success: true, message: 'API Ready' });
+      }
+    }
     
-    if (data.type === 'tasks') {
-      return saveTasksData(ss, data.tasks);
-    } else if (data.type === 'daily') {
-      return saveDailyData(ss, data);
-    } else if (data.type === 'pairwise') {
-      return savePairwiseData(ss, data);
+    if (method === 'POST') {
+      const data = JSON.parse(e.postData.contents);
+      
+      switch(data.type) {
+        case 'tasks':
+          return saveTasksData(ss, data.tasks);
+        case 'daily':
+          return saveDailyData(ss, data);
+        case 'pairwise':
+          return savePairwiseData(ss, data);
+        case 'progress':
+          return saveProgressData(ss, data);
+        case 'fullSync':
+          return saveFullSync(ss, data);
+        default:
+          return createResponse({ success: false, error: 'Unknown type' });
+      }
     }
   } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      success: false,
-      error: error.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
+    return createResponse({ success: false, error: error.message });
   }
 }
 
+function createResponse(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ==================== TASKS ====================
 function getTasksData(ss) {
   let sheet = ss.getSheetByName('Tasks');
   if (!sheet) {
-    sheet = ss.insertSheet('Tasks');
-    sheet.appendRow(['ID', 'Title', 'Column', 'Priority', 'Notes', 'Link', 'Created', 'Updated']);
+    return createResponse({ success: true, data: [] });
   }
   
   const data = sheet.getDataRange().getValues();
-  const tasks = [];
+  if (data.length <= 1) {
+    return createResponse({ success: true, data: [] });
+  }
   
+  const tasks = [];
   for (let i = 1; i < data.length; i++) {
     if (data[i][0]) {
       tasks.push({
@@ -883,29 +778,32 @@ function getTasksData(ss) {
         title: data[i][1],
         column: data[i][2],
         priority: data[i][3],
-        notes: data[i][4],
-        link: data[i][5],
+        notes: data[i][4] || '',
+        link: data[i][5] || '',
         created: data[i][6],
-        updated: data[i][7]
+        completed: data[i][7] || ''
       });
     }
   }
   
-  return ContentService.createTextOutput(JSON.stringify({
-    success: true,
-    data: tasks
-  })).setMimeType(ContentService.MimeType.JSON);
+  return createResponse({ success: true, data: tasks });
 }
 
 function saveTasksData(ss, tasks) {
   let sheet = ss.getSheetByName('Tasks');
   if (!sheet) {
     sheet = ss.insertSheet('Tasks');
+    sheet.appendRow(['ID', 'Title', 'Column', 'Priority', 'Notes', 'Link', 'Created', 'Completed']);
+    sheet.getRange(1, 1, 1, 8).setFontWeight('bold');
   }
   
-  sheet.clear();
-  sheet.appendRow(['ID', 'Title', 'Column', 'Priority', 'Notes', 'Link', 'Created', 'Updated']);
+  // Clear existing data (except header)
+  const lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    sheet.deleteRows(2, lastRow - 1);
+  }
   
+  // Add new data
   tasks.forEach(task => {
     sheet.appendRow([
       task.id,
@@ -914,89 +812,169 @@ function saveTasksData(ss, tasks) {
       task.priority,
       task.notes || '',
       task.link || '',
-      task.created || new Date().toISOString(),
-      new Date().toISOString()
+      task.created,
+      task.completed || ''
     ]);
   });
   
-  return ContentService.createTextOutput(JSON.stringify({
-    success: true,
-    message: 'Tasks saved: ' + tasks.length
-  })).setMimeType(ContentService.MimeType.JSON);
+  return createResponse({ success: true, message: 'Tasks saved', count: tasks.length });
 }
 
+// ==================== DAILY DATA ====================
 function getDailyData(ss, date) {
   let sheet = ss.getSheetByName('Daily');
   if (!sheet) {
-    return ContentService.createTextOutput(JSON.stringify({
-      success: false,
-      message: 'No daily data'
-    })).setMimeType(ContentService.MimeType.JSON);
+    return createResponse({ success: true, data: null });
   }
   
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     if (data[i][0] === date) {
-      return ContentService.createTextOutput(JSON.stringify({
+      return createResponse({
         success: true,
         data: {
+          date: data[i][0],
           checklist: JSON.parse(data[i][1] || '[]'),
-          reflections: JSON.parse(data[i][2] || '{}')
+          reflections: JSON.parse(data[i][2] || '{}'),
+          pomodoros: data[i][3] || 0,
+          focusTime: data[i][4] || 0
         }
-      })).setMimeType(ContentService.MimeType.JSON);
+      });
     }
   }
   
-  return ContentService.createTextOutput(JSON.stringify({
-    success: false,
-    message: 'No data for date'
-  })).setMimeType(ContentService.MimeType.JSON);
+  return createResponse({ success: true, data: null });
 }
 
 function saveDailyData(ss, data) {
   let sheet = ss.getSheetByName('Daily');
   if (!sheet) {
     sheet = ss.insertSheet('Daily');
-    sheet.appendRow(['Date', 'Checklist', 'Reflections', 'Updated']);
+    sheet.appendRow(['Date', 'Checklist', 'Reflections', 'Pomodoros', 'FocusTime', 'Timestamp']);
+    sheet.getRange(1, 1, 1, 6).setFontWeight('bold');
   }
   
-  const date = data.date;
-  const range = sheet.getDataRange();
-  const values = range.getValues();
-  
-  let found = false;
-  for (let i = 1; i < values.length; i++) {
-    if (values[i][0] === date) {
-      sheet.getRange(i + 1, 2, 1, 3).setValues([[
-        JSON.stringify(data.checklist),
-        JSON.stringify(data.reflections),
-        new Date().toISOString()
-      ]]);
-      found = true;
+  // Check if entry for today exists
+  const allData = sheet.getDataRange().getValues();
+  let rowIndex = -1;
+  for (let i = 1; i < allData.length; i++) {
+    if (allData[i][0] === data.date) {
+      rowIndex = i + 1;
       break;
     }
   }
   
-  if (!found) {
+  if (rowIndex > 0) {
+    // Update existing row
+    sheet.getRange(rowIndex, 2).setValue(JSON.stringify(data.checklist));
+    sheet.getRange(rowIndex, 3).setValue(JSON.stringify(data.reflections));
+    sheet.getRange(rowIndex, 4).setValue(data.pomodoros || 0);
+    sheet.getRange(rowIndex, 5).setValue(data.focusTime || 0);
+    sheet.getRange(rowIndex, 6).setValue(new Date().toISOString());
+  } else {
+    // Add new row
     sheet.appendRow([
-      date,
+      data.date,
       JSON.stringify(data.checklist),
       JSON.stringify(data.reflections),
+      data.pomodoros || 0,
+      data.focusTime || 0,
       new Date().toISOString()
     ]);
   }
   
-  return ContentService.createTextOutput(JSON.stringify({
-    success: true,
-    message: 'Daily data saved'
-  })).setMimeType(ContentService.MimeType.JSON);
+  return createResponse({ success: true, message: 'Daily data saved' });
 }
 
+// ==================== PROGRESS DATA ====================
+function getProgressData(ss, period) {
+  let sheet = ss.getSheetByName('Daily');
+  if (!sheet) {
+    return createResponse({ success: true, data: { days: [], summary: {} } });
+  }
+  
+  const now = new Date();
+  let startDate = new Date();
+  
+  switch(period) {
+    case 'week':
+      startDate.setDate(now.getDate() - 7);
+      break;
+    case 'month':
+      startDate.setMonth(now.getMonth() - 1);
+      break;
+    case 'quarter':
+      startDate.setMonth(now.getMonth() - 3);
+      break;
+    case 'year':
+      startDate.setFullYear(now.getFullYear() - 1);
+      break;
+  }
+  
+  const data = sheet.getDataRange().getValues();
+  const days = [];
+  let totalPomodoros = 0;
+  let totalFocus = 0;
+  let totalChecklist = 0;
+  let checklistDays = 0;
+  
+  for (let i = 1; i < data.length; i++) {
+    const rowDate = new Date(data[i][0].split('/').reverse().join('-'));
+    if (rowDate >= startDate) {
+      const checklist = JSON.parse(data[i][1] || '[]');
+      const checked = checklist.filter(c => c).length;
+      const total = checklist.length || 10;
+      
+      days.push({
+        date: data[i][0],
+        checklistPercent: Math.round((checked / total) * 100),
+        pomodoros: data[i][3] || 0,
+        focusTime: data[i][4] || 0
+      });
+      
+      totalPomodoros += data[i][3] || 0;
+      totalFocus += data[i][4] || 0;
+      totalChecklist += (checked / total) * 100;
+      checklistDays++;
+    }
+  }
+  
+  // Get completed tasks
+  let tasksSheet = ss.getSheetByName('Tasks');
+  let completedTasks = 0;
+  if (tasksSheet) {
+    const tasksData = tasksSheet.getDataRange().getValues();
+    for (let i = 1; i < tasksData.length; i++) {
+      if (tasksData[i][2] === 'done') {
+        const completedDate = tasksData[i][7] ? new Date(tasksData[i][7]) : null;
+        if (completedDate && completedDate >= startDate) {
+          completedTasks++;
+        }
+      }
+    }
+  }
+  
+  return createResponse({
+    success: true,
+    data: {
+      days: days,
+      summary: {
+        tasksCompleted: completedTasks,
+        totalPomodoros: totalPomodoros,
+        focusHours: Math.round(totalFocus / 60 * 10) / 10,
+        avgChecklist: checklistDays > 0 ? Math.round(totalChecklist / checklistDays) : 0
+      }
+    }
+  });
+}
+
+// ==================== PAIRWISE ====================
 function savePairwiseData(ss, data) {
   let sheet = ss.getSheetByName('Pairwise');
   if (!sheet) {
     sheet = ss.insertSheet('Pairwise');
     sheet.appendRow(['Date', 'Comparisons', 'Results', 'Timestamp']);
+    sheet.getRange(1, 1, 1, 4).setFontWeight('bold');
   }
   
   sheet.appendRow([
@@ -1006,13 +984,43 @@ function savePairwiseData(ss, data) {
     new Date().toISOString()
   ]);
   
-  return ContentService.createTextOutput(JSON.stringify({
-    success: true,
-    message: 'Pairwise results saved'
-  })).setMimeType(ContentService.MimeType.JSON);
+  return createResponse({ success: true, message: 'Pairwise saved' });
 }
-                            </pre>
-                        </div>
+
+// ==================== FULL SYNC ====================
+function getSyncData(ss) {
+  const tasksResult = JSON.parse(getTasksData(ss).getContent());
+  const today = new Date().toLocaleDateString('id-ID');
+  const dailyResult = JSON.parse(getDailyData(ss, today).getContent());
+  
+  return createResponse({
+    success: true,
+    data: {
+      tasks: tasksResult.data || [],
+      daily: dailyResult.data || null,
+      lastSync: new Date().toISOString()
+    }
+  });
+}
+
+function saveFullSync(ss, data) {
+  // Save tasks
+  if (data.tasks) {
+    saveTasksData(ss, data.tasks);
+  }
+  
+  // Save daily
+  if (data.daily) {
+    saveDailyData(ss, data.daily);
+  }
+  
+  return createResponse({ 
+    success: true, 
+    message: 'Full sync complete',
+    timestamp: new Date().toISOString()
+  });
+}
+                        </pre>
                     </div>
                 </div>
 
@@ -1040,11 +1048,49 @@ function savePairwiseData(ss, data) {
                     </div>
                 </div>
 
-                <!-- Sync Actions -->
+                <!-- Auto Sync Settings -->
                 <div class="card">
                     <div class="card-header">
                         <div class="card-icon icon-sync">🔄</div>
-                        <h2 class="card-title">Sinkronisasi Data</h2>
+                        <h2 class="card-title">Auto Sync</h2>
+                    </div>
+                    
+                    <div class="auto-sync-settings">
+                        <div class="setting-toggle">
+                            <label>
+                                <input type="checkbox" id="auto-sync-enabled" onchange="updateAutoSyncSettings()">
+                                Aktifkan Auto Sync
+                            </label>
+                            <p class="setting-desc">Data akan disinkronkan secara otomatis</p>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label>Interval Sync (menit)</label>
+                            <select id="sync-interval" onchange="updateAutoSyncSettings()">
+                                <option value="1">1 menit</option>
+                                <option value="5" selected>5 menit</option>
+                                <option value="10">10 menit</option>
+                                <option value="15">15 menit</option>
+                                <option value="30">30 menit</option>
+                            </select>
+                        </div>
+                        
+                        <div class="last-sync-info">
+                            <span>Sync terakhir:</span>
+                            <span id="last-sync-time">Belum pernah</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button class="btn-primary" onclick="manualSync()">🔄 Sync Sekarang</button>
+                    </div>
+                </div>
+
+                <!-- Manual Sync Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-data">📤</div>
+                        <h2 class="card-title">Sinkronisasi Manual</h2>
                     </div>
                     
                     <div class="sync-actions">
@@ -1067,16 +1113,6 @@ function savePairwiseData(ss, data) {
                             <div class="sync-buttons">
                                 <button class="btn-sync" onclick="syncDailyToSheet()">⬆️ Upload</button>
                                 <button class="btn-sync" onclick="loadDailyFromSheet()">⬇️ Download</button>
-                            </div>
-                        </div>
-                        
-                        <div class="sync-item">
-                            <div class="sync-info">
-                                <h4>⚖️ Hasil Pairwise</h4>
-                                <p>Simpan hasil prioritas</p>
-                            </div>
-                            <div class="sync-buttons">
-                                <button class="btn-sync" onclick="syncPairwiseToSheet()">⬆️ Upload</button>
                             </div>
                         </div>
                     </div>
@@ -1139,9 +1175,22 @@ function savePairwiseData(ss, data) {
         </div>
     </div>
 
+    <!-- Pairwise to Kanban Modal -->
+    <div class="modal-overlay" id="pairwise-kanban-modal">
+        <div class="modal">
+            <h2>📋 Tambah ke Kanban</h2>
+            <p class="modal-desc">Pilih prioritas yang akan ditambahkan ke Kanban Board:</p>
+            <div class="pairwise-kanban-list" id="pairwise-kanban-list"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closePairwiseKanbanModal()">Batal</button>
+                <button class="modal-btn modal-btn-save" onclick="confirmAddToKanban()">Tambahkan</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Audio for notifications -->
     <audio id="notification-sound" preload="auto">
-        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQwHYre51JdyCgNoo8OzkHQJBVmPuLKQfBUIVIS0sJeEFgxOgLCzlYYOAl58qrGxnpQhE1qBprOxnJMdGVp8n6+2ppwlFlqFpqawmJIXFlV5m6W0sZstJk19oaqwpJMRE0x3laGltaA2MU13mamolokMCUp9lZmcoKRKO010lqWdjoYLBEl9kpOWmJlWRlN0laGalY4ODU5+kIySkYxXR1Vzj5eYk5IWFk1+j4qHg3paSlRwjJGRj5IaG01+jYiBdnFhSlVtioqJho0cHEt+i4N1a2VjT1driYWAe4MZHUR8iIF2bWhlWFtnhH94b24TFT17h392cXBrXFxmdXtwaGcTEDl4hXp2dHNtYmJocnJqYWIODTd0gXd0c3VubGtsbm5mXl4MCTR0fXNwcHFwcXFubGRdWQkINXF6cGxqam1vcW9rYl1YCgczcXZsaGZlanBwbmhgW1gJBzJucWllYF5ka2xpZFxYVggHMGxsZ2JdW2BnaGViXVhVCAcvamllXlhYXWRkYV1ZVVMICC5oZmFaVVRaYV9dWlZSUAgILWZiXldTUlhcW1lWUk9NCAgqY15aVFBPVFhXVVJOTEoICClhW1ZRT01RVFNRTktJRwgJKF9YVFBMS09SUEZNR0RHBwknXFVRTkpITU9NSkVDQEQHCSdbUk5LR0VMTUpHQz4+QQcKJVlPTEhFQ0lKR0RBPT06BwsRWE1JRUJASEZDPzw4NwYAB1BJRUI+PENCPzs3MzQHCCFMRT49OjlAPDs2MS0sBgkgSUI7OTY0Ojg1MSwpKAYKH0U+ODYyMTY0Mi0pJiQGDRtAOTQxLi0yMC0pJSIfBw0YOzYwLSsqLiwnJCEeHAcOFDYxLCkoJysnIyAfHRsIEBIxLCgnJSQoJSEeHBkYCBAPLCglIyIhJSEfGxkXFgkRDSklISAdHCEeGxgVExMJEwwlIR4bGRkdGhcUEhAPChYPHx0aFxYWGRYTEA4NDAsLFBcZFhQTFBYTEA4LCggJCxQVEw8ODRANGQ4LCQcGBgsMEA4MCgkNDAwLCQcFBAMGBgkLCgoKCgsLCgkIBgUEBAQFBwkJCQkJCQkJCAcGBQQEBAUGBwgICAcIBwcHBwYGBQUFBQUFBgYGBgYGBgYGBgYGBgYGBQUFBQUFBQUFBQU=" type="audio/wav">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQwHYre51JdyCgNoo8OzkHQJBVmPuLKQfBUIVIS0sJeEFgxOgLCzlYYOAl58qrGxnpQhE1qBprOxnJMdGVp8n6+2ppwlFlqFpqawmJIXFlV5m6W0sZstJk19oaqwpJMRE0x3laGltaA2MU13mamolokMCUp9lZmcoKRKO010lqWdjoYLBEl9kpOWmJlWRlN0laGalY4ODU5+kIySkYxXR1Vzj5eYk5IWFk1+j4qHg3paSlRwjJGRj5IaG01+jYiBdnFhSlVtioqJho0cHEt+i4N1a2VjT1triYWAe4MZHUR8iIF2bWhlWFtnhH94b24TFT17h392cXBrXFxmdXtwaGcTEDl4hXp2dHNtYmJocnJqYWIODTd0gXd0c3VubGtsbm5mXl4MCTR0fXNwcHFwcXFubGRdWQkINXF6cGxqam1vcW9rYl1YCgczcXZsaGZlanBwbmhgW1gJBzJucWllYF5ka2xpZFxYVggHMGxsZ2JdW2BnaGViXVhVCAcvamllXlhYXWRkYV1ZVVMICC5oZmFaVVRaYV9dWlZSUAgILWZiXldTUlhcW1lWUk9NCAgqY15aVFBPVFhXVVJOTEoICClhW1ZRT01RVFNRTktJRwgJKF9YVFBMS09SUEZNR0RHBwknXFVRTkpITU9NSkVDQEQHCSdbUk5LR0VMTUpHQz4+QQcKJVlPTEhFQ0lKR0RBPT06BwsRWE1JRUJASEZDPzw4NwYAB1BJRUI+PENCPzs3MzQHCCFMRT49OjlAPDs2MS0sBgkgSUI7OTY0Ojg1MSwpKAYKH0U+ODYyMTY0Mi0pJiQGDRtAOTQxLi0yMC0pJSIfBw0YOzYwLSsqLiwnJCEeHAcOFDYxLCkoJysnIyAfHRsIEBIxLCgnJSQoJSEeHBkYCBAPLCglIyIhJSEfGxkXFgkRDSklISAdHCEeGxgVExMJEwwlIR4bGRkdGhcUEhAPChYPHx0aFxYWGRYTEA4NDAsLFBcZFhQTFBYTEA4LCggJCxQVEw8ODRANGQ4LCQcGBgsMEA4MCgkNDAwLCQcFBAMGBgkLCgoKCgsLCgkIBgUEBAQFBwkJCQkJCQkJCAcGBQQEBAUGBwgICAcIBwcHBwYGBQUFBQUFBgYGBgYGBgYGBgYGBgYGBQUFBQUFBQUFBQU=" type="audio/wav">
     </audio>
 
     <!-- Scripts -->
